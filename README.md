@@ -1,5 +1,8 @@
 # NodeBuy · 服务器测评与榜单
 
+[![CI](https://github.com/mm-gogogo/nodebuy/actions/workflows/ci.yml/badge.svg)](https://github.com/mm-gogogo/nodebuy/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 基于 **Payload CMS 3 + Next.js 16 + PostgreSQL** 的服务器测评 / 榜单 / AFF 推广站。
 前台为测评内容站，后台为 Payload 独立管理面板，所有内容（服务商、套餐、测评、榜单、优惠码）均可在后台维护。
 
@@ -69,7 +72,7 @@ src/
 
 ## AFF 跳转
 
-`/go/<provider-slug>?plan=<id>` 统一 302 跳转，优先级：套餐级 `affUrl` → 服务商 `affUrl` → 官网。
+`/go/<provider-slug>[?plan=<id>][?deal=<id>]` 统一 302 跳转，优先级：优惠级 `url` → 套餐级 `affUrl` → 服务商 `affUrl` → 官网。
 所有出站推广链接带 `rel="nofollow sponsored"`。在后台改链接即可全站生效，适合做推广域名。
 
 ## 路由
@@ -78,10 +81,12 @@ src/
 | --- | --- |
 | `/` | 首页（精选榜 / 最新测评 / 优惠 / 分类榜单 / 服务商索引） |
 | `/rankings` `/rankings/[slug]` | 榜单列表 / 详情 |
-| `/reviews` `/reviews/[slug]` | 测评列表 / 详情（含跑分表） |
-| `/providers/[slug]` | 服务商档案 + 在售套餐 + 相关测评 |
-| `/deals` | 优惠速递（优惠码点击复制） |
+| `/reviews` `/reviews/[slug]` | 测评列表 / 详情（含跑分表、Review JSON-LD） |
+| `/providers` `/providers/[slug]` | 服务商索引 / 档案 + 在售套餐 + 相关测评 |
+| `/deals` | 优惠速递（自动隐藏过期优惠，优惠码点击复制） |
 | `/go/[slug]` | AFF 302 跳转 |
+| `/feed.xml` | 最新测评 RSS 订阅 |
+| `/sitemap.xml` `/robots.txt` | SEO（自动生成） |
 | `/admin` | Payload 管理后台 |
 
 ## 常用命令
@@ -103,6 +108,10 @@ src/
 2. 配置 `DATABASE_URL` 指向生产 PostgreSQL；
 3. 将 `NEXT_PUBLIC_SERVER_URL` 设为站点对外地址。
 
+## 贡献
+
+欢迎 Issue 与 PR，流程与代码约定见 [CONTRIBUTING.md](CONTRIBUTING.md)。每个 PR 都会跑 CI（lint / 类型检查 / 集成测试 / 构建）。
+
 ## License
 
-MIT
+[MIT](LICENSE)

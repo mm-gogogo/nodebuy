@@ -1,0 +1,31 @@
+name: Bug 报告
+description: 功能异常、报错或与文档不符的行为
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: 问题描述
+      description: 发生了什么?期望的行为是什么?
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: 复现步骤
+      placeholder: |
+        1. 启动 `pnpm dev`
+        2. 打开 /reviews/xxx
+        3. ……
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: 环境
+      placeholder: 例如 macOS 15 / Node 22 / pnpm 10
+  - type: textarea
+    id: logs
+    attributes:
+      label: 相关日志或截图
+      render: shell
