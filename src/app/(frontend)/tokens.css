@@ -1,0 +1,65 @@
+/* Hallmark · genre: modern-minimal · macrostructure: Ecosystem Index · theme: Quiet · enrichment: none · nav: N5 · footer: Ft2 */
+/* Hallmark · pre-emit critique: P4 H5 E4 S4 R5 V4 */
+/* theme axes — paper: light (98%) · display: geometric-sans (Geist) · accent: cool (ink-blue 255°) */
+
+:root {
+  /* —— colour · Quiet —— */
+  --color-paper: oklch(98% 0.003 250);
+  --color-paper-2: oklch(95.5% 0.004 250);
+  --color-paper-3: oklch(92.5% 0.005 250);
+  --color-rule: oklch(89% 0.005 250);
+  --color-rule-strong: oklch(80% 0.006 250);
+  --color-neutral: oklch(50% 0.01 250);
+  --color-muted: oklch(40% 0.012 250);
+  --color-ink: oklch(20% 0.014 255);
+  --color-ink-soft: oklch(30% 0.013 255);
+  --color-accent: oklch(46% 0.14 255);
+  --color-accent-strong: oklch(38% 0.15 255);
+  --color-focus: oklch(52% 0.17 255);
+  --color-good: oklch(50% 0.12 155);
+  --color-warn: oklch(56% 0.14 60);
+  --color-on-ink: oklch(97% 0.004 250);
+
+  /* —— type —— */
+  --font-display: 'Geist', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-body: 'Geist', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-mono: 'Geist Mono', 'JetBrains Mono', 'Noto Sans SC', ui-monospace, monospace;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.84rem;
+  --text-base: 1rem;
+  --text-md: 1.25rem;
+  --text-lg: 1.5625rem;
+  --text-xl: 1.9531rem;
+  --text-2xl: 2.4414rem;
+  --text-display: clamp(2.1rem, 3.4vw + 0.8rem, 3.4rem);
+
+  /* —— space · 4pt —— */
+  --space-2xs: 0.25rem;
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2.25rem;
+  --space-2xl: 3.5rem;
+  --space-3xl: 5.5rem;
+  --space-nav: 4.5rem; /* 固定胶囊导航的页首净空 */
+
+  /* —— misc —— */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-pill: 999px;
+  --rule-hair: 1px;
+  --shadow-pill: 0 8px 24px -14px oklch(20% 0.014 255 / 0.25);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-short: 140ms;
+  --dur-mid: 220ms;
+
+  /* —— z scale —— */
+  --z-base: 0;
+  --z-raised: 10;
+  --z-nav: 20;
+  --z-overlay: 30;
+}
