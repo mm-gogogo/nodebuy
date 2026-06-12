@@ -6,6 +6,7 @@ import config from '@payload-config'
 import { AffButton, ProviderMark, RailHead, ScoreChip } from '@/components/ui'
 import { CopyCode } from '@/components/CopyCode'
 import { categoryDescriptions, categoryLabels, fmtDate, priceLine, routeLabels, specLine } from '@/lib/labels'
+import { activeDealsWhere } from '@/lib/queries'
 
 export const revalidate = 60
 
@@ -17,7 +18,7 @@ export default async function HomePage() {
     payload.find({ collection: 'plans', limit: 0 }),
     payload.find({ collection: 'reviews', limit: 7, sort: '-publishedAt', where: { _status: { equals: 'published' } } }),
     payload.find({ collection: 'rankings', limit: 20, sort: 'createdAt' }),
-    payload.find({ collection: 'deals', limit: 6, sort: '-featured' }),
+    payload.find({ collection: 'deals', limit: 6, sort: '-featured', where: activeDealsWhere() }),
   ])
 
   const featuredRanking =
@@ -152,7 +153,7 @@ export default async function HomePage() {
                 </div>
                 {d.code ? <CopyCode code={d.code} /> : null}
                 {d.expiresAt ? <span className="exp">截至 {fmtDate(d.expiresAt)}</span> : null}
-                {provider ? <AffButton slug={provider.slug} label="去下单" /> : null}
+                {provider ? <AffButton slug={provider.slug} dealId={d.id} label="去下单" /> : null}
               </div>
             )
           })}
@@ -177,7 +178,7 @@ export default async function HomePage() {
 
       {/* —— Rail 5 · 收录服务商 —— */}
       <section className="rail" aria-labelledby="rail-providers">
-        <RailHead title="收录服务商" />
+        <RailHead title="收录服务商" moreHref="/providers" />
         <ul className="provider-grid">
           {providers.docs.map((p) => (
             <li key={p.id}>
