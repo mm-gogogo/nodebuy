@@ -5,6 +5,7 @@ import config from '@payload-config'
 import { AffButton } from '@/components/ui'
 import { CopyCode } from '@/components/CopyCode'
 import { fmtDate } from '@/lib/labels'
+import { activeDealsWhere } from '@/lib/queries'
 
 export const revalidate = 60
 
@@ -12,7 +13,7 @@ export const metadata = { title: '优惠速递' }
 
 export default async function DealsPage() {
   const payload = await getPayload({ config })
-  const deals = await payload.find({ collection: 'deals', limit: 100, sort: '-featured' })
+  const deals = await payload.find({ collection: 'deals', limit: 100, sort: '-featured', where: activeDealsWhere() })
 
   return (
     <div className="wrap">
@@ -33,7 +34,7 @@ export default async function DealsPage() {
                 {d.discount ? <span className="badge badge--accent">{d.discount}</span> : null}
                 {d.code ? <CopyCode code={d.code} /> : null}
                 {d.expiresAt ? <span className="exp">截至 {fmtDate(d.expiresAt)}</span> : null}
-                {provider ? <AffButton slug={provider.slug} label="去下单" /> : null}
+                {provider ? <AffButton slug={provider.slug} dealId={d.id} label="去下单" /> : null}
               </div>
             )
           })}
