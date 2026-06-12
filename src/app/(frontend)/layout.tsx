@@ -2,13 +2,26 @@ import React from 'react'
 import Link from 'next/link'
 import './styles.css'
 
-export const metadata = {
+import type { Metadata } from 'next'
+
+const siteUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
+
+export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: {
     default: 'NodeBuy · 服务器测评与榜单',
     template: '%s · NodeBuy',
   },
   description:
     'NodeBuy 持续跑分测评海内外 VPS 与独立服务器，按线路、性能、性价比维护榜单，并同步整理在售优惠码。',
+  openGraph: {
+    siteName: 'NodeBuy',
+    type: 'website',
+    locale: 'zh_CN',
+  },
+  alternates: {
+    types: { 'application/rss+xml': '/feed.xml' },
+  },
 }
 
 export default async function RootLayout(props: { children: React.ReactNode }) {
@@ -37,6 +50,9 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
               <Link href="/reviews">测评</Link>
             </li>
             <li>
+              <Link href="/providers">服务商</Link>
+            </li>
+            <li>
               <Link href="/deals">优惠</Link>
             </li>
           </ul>
@@ -48,7 +64,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
               <span>© 2026 NodeBuy</span>
               <span>测评数据均为本站实测，跑分环境见各篇说明</span>
               <span className="aff-note">部分外链为推广链接（AFF），不影响测评结论</span>
-              <a href="/admin">管理后台</a>
+              <Link href="/admin">管理后台</Link>
             </p>
           </div>
         </footer>

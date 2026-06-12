@@ -69,13 +69,16 @@ export function ScoreBars({
 export function AffButton({
   slug,
   planId,
+  dealId,
   label = '官网直达',
 }: {
   slug: string
   planId?: string | number
+  dealId?: string | number
   label?: string
 }) {
-  const href = planId ? `/go/${slug}?plan=${planId}` : `/go/${slug}`
+  const query = planId ? `?plan=${planId}` : dealId ? `?deal=${dealId}` : ''
+  const href = `/go/${slug}${query}`
   return (
     <a className="btn-ink" href={href} target="_blank" rel="nofollow noopener sponsored">
       {label}

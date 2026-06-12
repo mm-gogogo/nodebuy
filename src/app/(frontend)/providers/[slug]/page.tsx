@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { cache } from 'react'
 import Link from 'next/link'
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getPayload } from 'payload'
 import config from '@payload-config'
@@ -11,13 +12,29 @@ export const revalidate = 60
 
 const regionLabels: Record<string, string> = { na: '北美', eu: '欧洲', apac: '亚太', cn: '中国大陆' }
 
-export default async function ProviderDetail({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params
+const getProvider = cache(async (slug: string) => {
   const payload = await getPayload({ config })
   const result = await payload.find({ collection: 'providers', where: { slug: { equals: slug } }, limit: 1 })
-  const provider = result.docs[0]
+  return result.docs[0] || null
+})
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params
+  const provider = await getProvider(slug)
+  if (!provider) return {}
+  return {
+    title: `${provider.name} 测评与套餐`,
+    description: provider.tagline || provider.description || undefined,
+    alternates: { canonical: `/providers/${slug}` },
+  }
+}
+
+export default async function ProviderDetail({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+  const provider = await getProvider(slug)
   if (!provider) notFound()
 
+  const payload = await getPayload({ config })
   const [plans, reviews] = await Promise.all([
     payload.find({ collection: 'plans', where: { provider: { equals: provider.id } }, limit: 50, sort: 'priceYearly' }),
     payload.find({

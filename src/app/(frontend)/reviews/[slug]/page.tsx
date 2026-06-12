@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { cache } from 'react'
 import Link from 'next/link'
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getPayload } from 'payload'
 import config from '@payload-config'
@@ -10,19 +11,74 @@ import { fmtDate, ispLabels, specLine } from '@/lib/labels'
 
 export const revalidate = 60
 
+const getReview = cache(async (slug: string) => {
+  const payload = await getPayload({ config })
+  const result = await payload.find({
+    collection: 'reviews',
+    where: { and: [{ slug: { equals: slug } }, { _status: { equals: 'published' } }] },
+    limit: 1,
+  })
+  return result.docs[0] || null
+})
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params
+  const review = await getReview(slug)
+  if (!review) return {}
+  return {
+    title: review.title,
+    description: review.excerpt || review.verdict || undefined,
+    alternates: { canonical: `/reviews/${slug}` },
+    openGraph: {
+      type: 'article',
+      title: review.title,
+      description: review.excerpt || undefined,
+      publishedTime: review.publishedAt,
+      modifiedTime: review.updatedAt,
+      authors: review.author ? [review.author] : undefined,
+    },
+  }
+}
+
 export default async function ReviewDetail({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const payload = await getPayload({ config })
-  const result = await payload.find({ collection: 'reviews', where: { slug: { equals: slug } }, limit: 1 })
-  const review = result.docs[0]
+  const review = await getReview(slug)
   if (!review) notFound()
 
   const provider = typeof review.provider === 'object' ? review.provider : null
   const plan = typeof review.plan === 'object' ? review.plan : null
   const bench = review.benchmarks
 
+  const scoreValues = [
+    review.scores?.performance,
+    review.scores?.network,
+    review.scores?.value,
+    review.scores?.support,
+  ].filter((v): v is number => v != null)
+  const ratingValue = scoreValues.length
+    ? Math.round((scoreValues.reduce((a, b) => a + b, 0) / scoreValues.length) * 10) / 10
+    : null
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Review',
+    headline: review.title,
+    description: review.excerpt || undefined,
+    datePublished: review.publishedAt,
+    dateModified: review.updatedAt,
+    author: { '@type': 'Organization', name: review.author || 'NodeBuy' },
+    itemReviewed: provider
+      ? { '@type': 'Service', name: plan ? `${provider.name} ${plan.name}` : provider.name, provider: { '@type': 'Organization', name: provider.name } }
+      : undefined,
+    reviewRating:
+      ratingValue != null
+        ? { '@type': 'Rating', ratingValue, bestRating: 10, worstRating: 0 }
+        : undefined,
+  }
+
   return (
     <div className="wrap">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <header className="article-head">
         <h1>{review.title}</h1>
         <div className="meta">

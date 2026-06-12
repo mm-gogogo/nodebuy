@@ -1,19 +1,35 @@
-import React from 'react'
+import React, { cache } from 'react'
 import Link from 'next/link'
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 
 import { AffButton, ProviderMark, ScoreChip } from '@/components/ui'
-import { categoryLabels, fmtDate, priceLine, routeLabels, specLine } from '@/lib/labels'
+import { categoryDescriptions, categoryLabels, fmtDate, priceLine, routeLabels, specLine } from '@/lib/labels'
 
 export const revalidate = 60
 
-export default async function RankingDetail({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params
+const getRanking = cache(async (slug: string) => {
   const payload = await getPayload({ config })
   const result = await payload.find({ collection: 'rankings', where: { slug: { equals: slug } }, limit: 1 })
-  const ranking = result.docs[0]
+  return result.docs[0] || null
+})
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params
+  const ranking = await getRanking(slug)
+  if (!ranking) return {}
+  return {
+    title: ranking.title,
+    description: ranking.description || categoryDescriptions[ranking.category] || undefined,
+    alternates: { canonical: `/rankings/${slug}` },
+  }
+}
+
+export default async function RankingDetail({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+  const ranking = await getRanking(slug)
   if (!ranking) notFound()
 
   return (

@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: nodebuy
+          POSTGRES_PASSWORD: nodebuy
+          POSTGRES_DB: nodebuy
+        ports:
+          - 5434:5432
+        options: >-
+          --health-cmd "pg_isready -U nodebuy"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql://nodebuy:nodebuy@127.0.0.1:5434/nodebuy
+      PAYLOAD_SECRET: ci-only-secret
+      NEXT_PUBLIC_SERVER_URL: http://localhost:3000
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Init schema & seed demo data
+        run: npx tsx src/seed.ts
+
+      - name: Integration tests
+        run: pnpm test:int
+
+      - name: Build
+        run: pnpm build
