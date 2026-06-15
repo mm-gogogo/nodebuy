@@ -4,6 +4,7 @@ import { getPayload } from 'payload'
 import config from '@payload-config'
 
 import { fmtDate } from '@/lib/labels'
+import { reviewRowMetrics } from '@/lib/reviewMetrics'
 
 export const revalidate = 60
 
@@ -28,12 +29,23 @@ export default async function ReviewsPage() {
         <div role="list">
           {reviews.docs.map((r) => {
             const provider = typeof r.provider === 'object' ? r.provider : null
+            const metrics = reviewRowMetrics(r)
             return (
               <Link role="listitem" className="review-row" key={r.id} href={`/reviews/${r.slug}`}>
                 <span className="t">
                   {r.title}
                   {provider ? <span className="badge" style={{ marginLeft: 'var(--space-xs)' }}>{provider.name}</span> : null}
                 </span>
+                {metrics.length ? (
+                  <span className="rev-metrics">
+                    {metrics.map((m) => (
+                      <span className="rev-metric" key={m.label}>
+                        <span className="k">{m.label}</span>
+                        {m.value}
+                      </span>
+                    ))}
+                  </span>
+                ) : null}
                 <span className="meta">{fmtDate(r.publishedAt)}</span>
               </Link>
             )

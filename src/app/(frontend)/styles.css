@@ -477,6 +477,28 @@ main {
   font-variant-numeric: tabular-nums;
 }
 
+.review-row .rev-metrics {
+  display: flex;
+  gap: var(--space-sm);
+  margin-left: auto;
+  white-space: nowrap;
+}
+.review-row .rev-metric {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+.review-row .rev-metric .k {
+  color: var(--color-neutral);
+  margin-right: var(--space-2xs);
+}
+@media (max-width: 640px) {
+  .review-row .rev-metrics {
+    display: none;
+  }
+}
+
 .review-meta-line {
   display: flex;
   flex-wrap: wrap;
