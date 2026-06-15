@@ -32,6 +32,8 @@ export const ispLabels: Record<string, string> = {
   cm: '移动',
 }
 
+export const storageTypeLabels: Record<string, string> = { nvme: 'NVMe', ssd: 'SSD', hdd: 'HDD' }
+
 export function ramLabel(mb?: number | null): string {
   if (!mb) return '—'
   return mb >= 1024 ? `${mb / 1024}G` : `${mb}M`
@@ -47,7 +49,10 @@ export function specLine(plan: {
   const parts: string[] = []
   if (plan.cpuCores) parts.push(`${plan.cpuCores}C`)
   if (plan.ramMB) parts.push(ramLabel(plan.ramMB))
-  if (plan.storageGB) parts.push(`${plan.storageGB}G ${(plan.storageType || 'ssd').toUpperCase()}`)
+  if (plan.storageGB) {
+    const type = plan.storageType || 'nvme' // 与 Plans 集合的默认值保持一致
+    parts.push(`${plan.storageGB}G ${storageTypeLabels[type] || type.toUpperCase()}`)
+  }
   if (plan.trafficTB != null) parts.push(plan.trafficTB === 0 ? '不限流量' : `${plan.trafficTB}T/月`)
   return parts.join(' · ')
 }
@@ -64,5 +69,8 @@ export function priceLine(plan: { priceMonthly?: number | null; priceYearly?: nu
 export function fmtDate(iso?: string | null): string {
   if (!iso) return '—'
   const d = new Date(iso)
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+  if (Number.isNaN(d.getTime())) return '—'
+  // 用 UTC 取值：日期字段存为当天 00:00 UTC，服务端渲染时若用本地时区，
+  // 在 UTC 以西的服务器上会少一天。固定按 UTC 显示编辑当初录入的日期。
+  return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`
 }
