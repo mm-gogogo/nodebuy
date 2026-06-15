@@ -12,9 +12,10 @@ export interface ProviderItem {
   cnOptimized: boolean
   planCount: number
   regions: string[]
+  startingMonthly?: number | null // 最低等效月价(起步价),无则 null
 }
 
-export type ProviderSort = 'score' | 'name' | 'plans'
+export type ProviderSort = 'score' | 'name' | 'plans' | 'price'
 
 export interface ProviderFilterState {
   query: string
@@ -42,6 +43,9 @@ export function filterSortProviders(items: ProviderItem[], state: ProviderFilter
     sorted.sort((a, b) => a.name.localeCompare(b.name))
   } else if (state.sort === 'plans') {
     sorted.sort((a, b) => b.planCount - a.planCount)
+  } else if (state.sort === 'price') {
+    // 起步价 低→高,无价排末尾
+    sorted.sort((a, b) => (a.startingMonthly ?? Infinity) - (b.startingMonthly ?? Infinity))
   } else {
     // score:综合评分降序,无评分排末尾
     sorted.sort((a, b) => (b.overallScore ?? -1) - (a.overallScore ?? -1))

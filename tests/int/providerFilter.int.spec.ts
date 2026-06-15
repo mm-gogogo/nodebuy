@@ -13,9 +13,9 @@ const mk = (over: Partial<ProviderItem>): ProviderItem => ({
 })
 
 const items: ProviderItem[] = [
-  mk({ id: 1, name: 'BandwagonHost', tagline: 'CN2 GIA', headquarters: '加拿大', overallScore: 8.9, cnOptimized: true, planCount: 3, regions: ['na', 'apac'] }),
-  mk({ id: 2, name: 'Hetzner', tagline: '欧洲', headquarters: '德国', overallScore: 8.1, cnOptimized: false, planCount: 2, regions: ['eu'] }),
-  mk({ id: 3, name: 'CloudCone', tagline: '洛杉矶', headquarters: '美国', overallScore: 7.4, cnOptimized: false, planCount: 0, regions: ['na'] }),
+  mk({ id: 1, name: 'BandwagonHost', tagline: 'CN2 GIA', headquarters: '加拿大', overallScore: 8.9, cnOptimized: true, planCount: 3, regions: ['na', 'apac'], startingMonthly: 16.99 }),
+  mk({ id: 2, name: 'Hetzner', tagline: '欧洲', headquarters: '德国', overallScore: 8.1, cnOptimized: false, planCount: 2, regions: ['eu'], startingMonthly: 4.5 }),
+  mk({ id: 3, name: 'CloudCone', tagline: '洛杉矶', headquarters: '美国', overallScore: 7.4, cnOptimized: false, planCount: 0, regions: ['na'], startingMonthly: null }),
 ]
 
 const base = { query: '', cnOnly: false, inStockOnly: false, region: 'all', sort: 'score' as const }
@@ -60,5 +60,9 @@ describe('filterSortProviders · 排序', () => {
   it('无评分排末尾', () => {
     const withNull = [...items, mk({ id: 4, name: 'NoScore', overallScore: null })]
     expect(filterSortProviders(withNull, base).map((i) => i.id).at(-1)).toBe(4)
+  })
+  it('按起步价升序,无价排末尾', () => {
+    // 起步价:id2=4.5, id1=16.99, id3=null
+    expect(filterSortProviders(items, { ...base, sort: 'price' }).map((i) => i.id)).toEqual([2, 1, 3])
   })
 })

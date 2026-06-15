@@ -20,9 +20,17 @@ export default async function ProvidersPage() {
   ])
 
   const planCounts = new Map<string | number, number>()
+  const startingPrice = new Map<string | number, number>() // 各服务商最低等效月价(仅有货)
   for (const plan of plans.docs) {
     const pid = typeof plan.provider === 'object' ? plan.provider?.id : plan.provider
-    if (pid != null) planCounts.set(pid, (planCounts.get(pid) || 0) + 1)
+    if (pid == null) continue
+    planCounts.set(pid, (planCounts.get(pid) || 0) + 1)
+    if (plan.inStock === false) continue
+    const m = plan.priceMonthly != null ? plan.priceMonthly : plan.priceYearly != null ? plan.priceYearly / 12 : null
+    if (m != null) {
+      const cur = startingPrice.get(pid)
+      if (cur == null || m < cur) startingPrice.set(pid, m)
+    }
   }
 
   // 只把客户端筛选需要的字段传过去，避免序列化整份文档
@@ -38,6 +46,7 @@ export default async function ProvidersPage() {
     cnOptimized: (p.datacenters || []).some((dc) => dc.cnOptimized),
     planCount: planCounts.get(p.id) || 0,
     regions: [...new Set((p.datacenters || []).flatMap((dc) => (dc.region ? [dc.region] : [])))],
+    startingMonthly: startingPrice.get(p.id) ?? null,
   }))
 
   return (

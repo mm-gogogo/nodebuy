@@ -9,6 +9,7 @@ import { regionLabels } from '@/lib/labels'
 
 const SORTS: { value: ProviderSort; label: string }[] = [
   { value: 'score', label: '综合评分 高→低' },
+  { value: 'price', label: '起步价 低→高' },
   { value: 'plans', label: '在售套餐 多→少' },
   { value: 'name', label: '名称' },
 ]
@@ -111,6 +112,9 @@ export function ProviderFilter({ items }: { items: ProviderItem[] }) {
                 <span className="sub">{p.tagline || p.headquarters || ''}</span>
               </span>
               <span className="facts">
+                {p.startingMonthly != null ? (
+                  <span>起步 ${Math.round(p.startingMonthly * 100) / 100}/月</span>
+                ) : null}
                 {p.datacenterCount ? <span>{p.datacenterCount} 个机房</span> : null}
                 {p.planCount ? <span>{p.planCount} 个在售套餐</span> : null}
               </span>
