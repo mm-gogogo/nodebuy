@@ -1,9 +1,9 @@
 import React from 'react'
-import Link from 'next/link'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 
-import { fmtDate } from '@/lib/labels'
+import { ReviewBrowser } from '@/components/ReviewBrowser'
+import type { ReviewItem } from '@/lib/reviewFilter'
 import { reviewRowMetrics } from '@/lib/reviewMetrics'
 
 export const revalidate = 60
@@ -14,43 +14,32 @@ export default async function ReviewsPage() {
   const payload = await getPayload({ config })
   const reviews = await payload.find({
     collection: 'reviews',
-    limit: 100,
+    limit: 200,
     sort: '-publishedAt',
     where: { _status: { equals: 'published' } },
+  })
+
+  const items: ReviewItem[] = reviews.docs.map((r) => {
+    const provider = typeof r.provider === 'object' ? r.provider : null
+    return {
+      id: r.id,
+      title: r.title,
+      slug: r.slug,
+      providerName: provider?.name || '—',
+      providerSlug: provider?.slug || '',
+      publishedAt: r.publishedAt,
+      metrics: reviewRowMetrics(r),
+    }
   })
 
   return (
     <div className="wrap">
       <header className="masthead">
         <h1>全部测评</h1>
-        <p className="lede">每篇都附完整跑分与三网回程数据，结论只对当时的批次负责——线路会调整，下单前看清日期。</p>
+        <p className="lede">每篇都附完整跑分与三网回程数据,结论只对当时的批次负责——线路会调整,下单前看清日期。</p>
       </header>
       <section className="rail--tight">
-        <div role="list">
-          {reviews.docs.map((r) => {
-            const provider = typeof r.provider === 'object' ? r.provider : null
-            const metrics = reviewRowMetrics(r)
-            return (
-              <Link role="listitem" className="review-row" key={r.id} href={`/reviews/${r.slug}`}>
-                <span className="t">
-                  {r.title}
-                  {provider ? <span className="badge" style={{ marginLeft: 'var(--space-xs)' }}>{provider.name}</span> : null}
-                </span>
-                {metrics.length ? (
-                  <span className="rev-metrics">
-                    {metrics.map((m) => (
-                      <span className="rev-metric" key={m.label}>
-                        <span className="k">{m.label}</span>
-                        {m.value}
-                      </span>
-                    ))}
-                  </span>
-                ) : null}
-                <span className="meta">{fmtDate(r.publishedAt)}</span>
-              </Link>
-            )
-          })}
-        </div>
+        {items.length === 0 ? <p className="empty-note">测评正在路上。</p> : <ReviewBrowser items={items} />}
       </section>
     </div>
   )
