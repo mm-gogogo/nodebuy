@@ -9,6 +9,7 @@ const pages: Array<{ name: string; path: string }> = [
   { name: '测评列表', path: '/reviews' },
   { name: '测评详情', path: '/reviews/bandwagonhost-cn2-gia-e-dc6-review' },
   { name: '套餐总览', path: '/plans' },
+  { name: '线路总览', path: '/lines' },
   { name: '套餐对比', path: '/compare?plans=1,3' },
   { name: '搜索结果', path: '/search?q=bandwagon' },
   { name: '我的收藏', path: '/favorites' },
