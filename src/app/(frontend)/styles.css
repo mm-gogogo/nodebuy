@@ -817,6 +817,30 @@ main {
   border: 0;
 }
 
+/* ———— plan guide ———— */
+.guide-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+  padding: var(--space-lg);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-md);
+  background: var(--color-paper-2);
+}
+.guide-q {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm) var(--space-md);
+}
+.guide-q-label {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-ink-soft);
+  min-width: 5rem;
+}
+
 /* ———— line aggregate ———— */
 .line-list {
   list-style: none;

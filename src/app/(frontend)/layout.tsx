@@ -47,6 +47,9 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
           </Link>
           <ul className="nav-pill__links">
             <li>
+              <Link href="/guide">选购</Link>
+            </li>
+            <li>
               <Link href="/rankings">榜单</Link>
             </li>
             <li>
