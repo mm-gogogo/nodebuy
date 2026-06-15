@@ -10,7 +10,7 @@ import { FavoriteButton } from '@/components/FavoriteButton'
 import { JsonLd } from '@/components/JsonLd'
 import { breadcrumbList } from '@/lib/jsonld'
 import { findProviderRankings, type RankingLite } from '@/lib/providerRankings'
-import { categoryLabels, fmtDate, priceLine, regionLabels, routeLabels, specLine } from '@/lib/labels'
+import { categoryLabels, fmtDate, payLabels, priceLine, regionLabels, routeLabels, specLine } from '@/lib/labels'
 
 export const revalidate = 60
 
@@ -49,15 +49,6 @@ export default async function ProviderDetail({ params }: { params: Promise<{ slu
   ])
 
   const appearances = findProviderRankings(rankings.docs as RankingLite[], provider.id)
-
-  const payLabels: Record<string, string> = {
-    alipay: '支付宝',
-    wechat: '微信支付',
-    paypal: 'PayPal',
-    card: '信用卡',
-    crypto: '加密货币',
-    unionpay: '银联',
-  }
 
   const crumbs = [
     { name: '首页', path: '/' },

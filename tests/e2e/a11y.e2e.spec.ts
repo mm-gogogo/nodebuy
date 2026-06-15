@@ -12,6 +12,7 @@ const pages: Array<{ name: string; path: string }> = [
   { name: '线路总览', path: '/lines' },
   { name: '机房地区', path: '/regions' },
   { name: '套餐对比', path: '/compare?plans=1,3' },
+  { name: '服务商对比', path: '/compare-providers?slugs=bandwagonhost,dmit' },
   { name: '搜索结果', path: '/search?q=bandwagon' },
   { name: '我的收藏', path: '/favorites' },
   { name: '服务商索引', path: '/providers' },
