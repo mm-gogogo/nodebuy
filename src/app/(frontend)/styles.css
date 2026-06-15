@@ -1101,6 +1101,12 @@ main {
 .plan-browse .pb-price strong {
   font-size: var(--text-md);
 }
+.plan-browse .pb-unit {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-neutral);
+}
 @media (max-width: 760px) {
   .plan-browse .pb-spec {
     display: none;
