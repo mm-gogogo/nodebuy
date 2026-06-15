@@ -131,7 +131,7 @@ export default async function ReviewDetail({ params }: { params: Promise<{ slug:
           </>
         ) : null}
 
-        {bench && (bench.gb5Single || bench.diskReadMBs) ? (
+        {bench && (bench.cpuModel || bench.gb5Single || bench.gb5Multi || bench.diskReadMBs || bench.diskWriteMBs) ? (
           <>
             <h2>跑分</h2>
             <table className="bench-table">
