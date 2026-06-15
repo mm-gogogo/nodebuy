@@ -817,6 +817,40 @@ main {
   border: 0;
 }
 
+/* ———— favorites ———— */
+.fav-btn {
+  font: inherit;
+  font-size: var(--text-sm);
+  padding: var(--space-2xs) var(--space-md);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-ink-soft);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color var(--dur-short) var(--ease-out);
+}
+.fav-btn:hover {
+  border-color: var(--color-rule-strong);
+}
+.fav-btn.is-on {
+  color: var(--color-warn);
+  border-color: var(--color-warn);
+}
+.fav-btn:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+.fav-list li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+.fav-list li > a {
+  flex: 1;
+  min-width: 0;
+}
+
 /* ———— plan compare ———— */
 .cmp-toggle {
   font: inherit;

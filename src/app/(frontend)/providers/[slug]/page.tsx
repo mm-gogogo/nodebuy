@@ -6,6 +6,7 @@ import { getPayload } from 'payload'
 import config from '@payload-config'
 
 import { AffButton, Breadcrumbs, ProviderMark, RailHead, ScoreBars } from '@/components/ui'
+import { FavoriteButton } from '@/components/FavoriteButton'
 import { JsonLd } from '@/components/JsonLd'
 import { breadcrumbList } from '@/lib/jsonld'
 import { findProviderRankings, type RankingLite } from '@/lib/providerRankings'
@@ -77,7 +78,8 @@ export default async function ProviderDetail({ params }: { params: Promise<{ slu
             <h1>{provider.name}</h1>
             {provider.tagline ? <p style={{ color: 'var(--color-muted)', marginTop: 'var(--space-2xs)' }}>{provider.tagline}</p> : null}
           </div>
-          <div style={{ marginLeft: 'auto' }}>
+          <div style={{ marginLeft: 'auto', display: 'flex', gap: 'var(--space-sm)', alignItems: 'center' }}>
+            <FavoriteButton slug={provider.slug} name={provider.name} />
             <AffButton slug={provider.slug} label="官网直达" />
           </div>
         </div>

@@ -11,6 +11,7 @@ const pages: Array<{ name: string; path: string }> = [
   { name: '套餐总览', path: '/plans' },
   { name: '套餐对比', path: '/compare?plans=1,3' },
   { name: '搜索结果', path: '/search?q=bandwagon' },
+  { name: '我的收藏', path: '/favorites' },
   { name: '服务商索引', path: '/providers' },
   { name: '服务商详情', path: '/providers/bandwagonhost' },
   { name: '优惠速递', path: '/deals' },
