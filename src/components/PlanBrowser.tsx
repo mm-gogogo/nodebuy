@@ -1,12 +1,13 @@
 'use client'
 
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 
 import { AffButton, ProviderMark } from '@/components/ui'
 import { priceLine, routeLabels, specLine } from '@/lib/labels'
 import { filterSortPlans, type PlanItem, type PlanSort } from '@/lib/planBrowse'
 import { MAX_COMPARE } from '@/lib/compare'
+import { buildPlanQuery, DEFAULT_PLAN_STATE, type PlanQueryState } from '@/lib/planQuery'
 
 const SORTS: { value: PlanSort; label: string }[] = [
   { value: 'price-asc', label: '价格 低→高' },
@@ -22,16 +23,25 @@ const RAM_STEPS: { mb: number; label: string }[] = [
   { mb: 8192, label: '8G+' },
 ]
 
-export function PlanBrowser({ items, initialRoute }: { items: PlanItem[]; initialRoute?: string }) {
-  const [query, setQuery] = useState('')
-  // 仅当 initialRoute 是数据里实际存在的线路时采用,否则回落到「全部」
+export function PlanBrowser({ items, initial }: { items: PlanItem[]; initial?: PlanQueryState }) {
+  const init = initial ?? DEFAULT_PLAN_STATE
+  const [query, setQuery] = useState(init.query)
+  // 仅当 route 是数据里实际存在的线路时采用,否则回落到「全部」
   const [route, setRoute] = useState(
-    initialRoute && items.some((p) => p.route === initialRoute) ? initialRoute : 'all',
+    init.route !== 'all' && items.some((p) => p.route === init.route) ? init.route : 'all',
   )
-  const [sort, setSort] = useState<PlanSort>('price-asc')
-  const [inStockOnly, setInStockOnly] = useState(false)
-  const [maxPrice, setMaxPrice] = useState('')
-  const [minRamMB, setMinRamMB] = useState(0)
+  const [sort, setSort] = useState<PlanSort>(init.sort)
+  const [inStockOnly, setInStockOnly] = useState(init.inStockOnly)
+  const [maxPrice, setMaxPrice] = useState(init.maxPrice)
+  const [minRamMB, setMinRamMB] = useState(init.minRamMB)
+
+  // 把筛选状态同步进 URL(history.replaceState,纯客户端、不触发重新请求),
+  // 让筛选视图可分享/可收藏/刷新后保持。
+  useEffect(() => {
+    const qs = buildPlanQuery({ query, route, sort, maxPrice, minRamMB, inStockOnly })
+    const url = qs ? `${window.location.pathname}?${qs}` : window.location.pathname
+    window.history.replaceState(null, '', url)
+  }, [query, route, sort, maxPrice, minRamMB, inStockOnly])
   const [selected, setSelected] = useState<number[]>([])
 
   const atMax = selected.length >= MAX_COMPARE

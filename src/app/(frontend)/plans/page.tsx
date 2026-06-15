@@ -4,6 +4,7 @@ import config from '@payload-config'
 
 import { PlanBrowser } from '@/components/PlanBrowser'
 import type { PlanItem } from '@/lib/planBrowse'
+import { readPlanQuery } from '@/lib/planQuery'
 
 export const revalidate = 60
 
@@ -12,8 +13,12 @@ export const metadata = {
   description: '跨服务商浏览全部在售套餐，按线路筛选、按价格或内存排序，一处对比规格与价格。',
 }
 
-export default async function PlansPage({ searchParams }: { searchParams: Promise<{ route?: string }> }) {
-  const { route: initialRoute } = await searchParams
+export default async function PlansPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>
+}) {
+  const initial = readPlanQuery(await searchParams)
   const payload = await getPayload({ config })
   const plans = await payload.find({ collection: 'plans', limit: 1000, sort: 'priceYearly' })
 
@@ -48,7 +53,7 @@ export default async function PlansPage({ searchParams }: { searchParams: Promis
         {items.length === 0 ? (
           <p className="empty-note">暂无在售套餐。</p>
         ) : (
-          <PlanBrowser items={items} initialRoute={initialRoute} />
+          <PlanBrowser items={items} initial={initial} />
         )}
       </section>
     </div>
