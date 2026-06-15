@@ -188,7 +188,7 @@ export interface Provider {
   affUrl?: string | null;
   logo?: (number | null) | Media;
   /**
-   * 无 Logo 时用于生成字母徽标底色
+   * 无 Logo 时用于生成字母徽标底色，如 #2b6cb0
    */
   brandColor?: string | null;
   founded?: number | null;
