@@ -646,6 +646,64 @@ main {
   }
 }
 
+/* ———— provider index filter bar ———— */
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+}
+.filter-search {
+  flex: 1;
+  min-width: 12rem;
+  font: inherit;
+  font-size: var(--text-sm);
+  padding: var(--space-xs) var(--space-md);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-pill);
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+.filter-search:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+  border-color: var(--color-accent);
+}
+.filter-chip {
+  font: inherit;
+  font-size: var(--text-sm);
+  padding: var(--space-xs) var(--space-md);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-ink-soft);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    border-color var(--dur-short) var(--ease-out),
+    background-color var(--dur-short) var(--ease-out);
+}
+.filter-chip:hover {
+  border-color: var(--color-rule-strong);
+}
+.filter-chip.is-on {
+  background: var(--color-ink);
+  color: var(--color-on-ink);
+  border-color: var(--color-ink);
+}
+.filter-chip:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+.filter-count {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-neutral);
+  font-variant-numeric: tabular-nums;
+  margin-left: auto;
+}
+
 /* ———— provider index page ———— */
 .provider-index {
   list-style: none;
