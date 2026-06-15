@@ -1,10 +1,11 @@
 'use client'
 
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 
 import { ProviderMark, ScoreChip } from '@/components/ui'
 import { filterSortProviders, type ProviderItem, type ProviderSort } from '@/lib/providerFilter'
+import { buildProviderQuery, DEFAULT_PROVIDER_STATE, type ProviderQueryState } from '@/lib/providerQuery'
 import { payLabels, regionLabels } from '@/lib/labels'
 
 const SORTS: { value: ProviderSort; label: string }[] = [
@@ -14,13 +15,21 @@ const SORTS: { value: ProviderSort; label: string }[] = [
   { value: 'name', label: '名称' },
 ]
 
-export function ProviderFilter({ items }: { items: ProviderItem[] }) {
-  const [query, setQuery] = useState('')
-  const [cnOnly, setCnOnly] = useState(false)
-  const [inStockOnly, setInStockOnly] = useState(false)
-  const [region, setRegion] = useState('all')
-  const [payment, setPayment] = useState('all')
-  const [sort, setSort] = useState<ProviderSort>('score')
+export function ProviderFilter({ items, initial }: { items: ProviderItem[]; initial?: ProviderQueryState }) {
+  const init = initial ?? DEFAULT_PROVIDER_STATE
+  const [query, setQuery] = useState(init.query)
+  const [cnOnly, setCnOnly] = useState(init.cnOnly)
+  const [inStockOnly, setInStockOnly] = useState(init.inStockOnly)
+  const [region, setRegion] = useState(init.region)
+  const [payment, setPayment] = useState(init.payment)
+  const [sort, setSort] = useState<ProviderSort>(init.sort)
+
+  // 同步筛选状态到 URL(history.replaceState,纯客户端、不触发重新请求)
+  useEffect(() => {
+    const qs = buildProviderQuery({ query, cnOnly, inStockOnly, region, payment, sort })
+    const url = qs ? `${window.location.pathname}?${qs}` : window.location.pathname
+    window.history.replaceState(null, '', url)
+  }, [query, cnOnly, inStockOnly, region, payment, sort])
 
   // 只展示数据里出现过的区域
   const regions = useMemo(() => {
