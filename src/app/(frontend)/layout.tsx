@@ -56,6 +56,9 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
               <Link href="/plans">套餐</Link>
             </li>
             <li>
+              <Link href="/lines">线路</Link>
+            </li>
+            <li>
               <Link href="/providers">服务商</Link>
             </li>
             <li>

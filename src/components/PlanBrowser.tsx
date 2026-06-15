@@ -14,9 +14,12 @@ const SORTS: { value: PlanSort; label: string }[] = [
   { value: 'ram-desc', label: '内存 大→小' },
 ]
 
-export function PlanBrowser({ items }: { items: PlanItem[] }) {
+export function PlanBrowser({ items, initialRoute }: { items: PlanItem[]; initialRoute?: string }) {
   const [query, setQuery] = useState('')
-  const [route, setRoute] = useState('all')
+  // 仅当 initialRoute 是数据里实际存在的线路时采用,否则回落到「全部」
+  const [route, setRoute] = useState(
+    initialRoute && items.some((p) => p.route === initialRoute) ? initialRoute : 'all',
+  )
   const [sort, setSort] = useState<PlanSort>('price-asc')
   const [inStockOnly, setInStockOnly] = useState(false)
   const [selected, setSelected] = useState<number[]>([])
