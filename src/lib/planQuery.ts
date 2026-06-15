@@ -12,7 +12,7 @@ export interface PlanQueryState {
   inStockOnly: boolean
 }
 
-const VALID_SORTS: PlanSort[] = ['price-asc', 'price-desc', 'ram-desc']
+const VALID_SORTS: PlanSort[] = ['price-asc', 'price-desc', 'ram-desc', 'value-ram']
 const VALID_RAM = [0, 1024, 2048, 4096, 8192]
 
 export const DEFAULT_PLAN_STATE: PlanQueryState = {

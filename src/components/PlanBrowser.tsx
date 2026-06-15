@@ -5,7 +5,7 @@ import Link from 'next/link'
 
 import { AffButton, ProviderMark } from '@/components/ui'
 import { priceLine, routeLabels, specLine } from '@/lib/labels'
-import { filterSortPlans, type PlanItem, type PlanSort } from '@/lib/planBrowse'
+import { filterSortPlans, pricePerGbRam, type PlanItem, type PlanSort } from '@/lib/planBrowse'
 import { MAX_COMPARE } from '@/lib/compare'
 import { buildPlanQuery, DEFAULT_PLAN_STATE, type PlanQueryState } from '@/lib/planQuery'
 
@@ -13,6 +13,7 @@ const SORTS: { value: PlanSort; label: string }[] = [
   { value: 'price-asc', label: '价格 低→高' },
   { value: 'price-desc', label: '价格 高→低' },
   { value: 'ram-desc', label: '内存 大→小' },
+  { value: 'value-ram', label: '每 G 内存最划算' },
 ]
 
 const RAM_STEPS: { mb: number; label: string }[] = [
@@ -173,6 +174,12 @@ export function PlanBrowser({ items, initial }: { items: PlanItem[]; initial?: P
               <span className="pb-price">
                 <strong>{price.amount}</strong>
                 {price.cycle}
+                {(() => {
+                  const v = pricePerGbRam(p)
+                  return Number.isFinite(v) ? (
+                    <span className="pb-unit">≈${v < 1 ? v.toFixed(2) : v.toFixed(1)}/G内存</span>
+                  ) : null
+                })()}
               </span>
               {(() => {
                 const on = selected.includes(p.id)

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { filterSortPlans, effectiveMonthly, type PlanItem } from '@/lib/planBrowse'
+import { filterSortPlans, effectiveMonthly, pricePerGbRam, type PlanItem } from '@/lib/planBrowse'
 
 const mk = (over: Partial<PlanItem>): PlanItem => ({
   id: 0,
@@ -80,5 +80,21 @@ describe('filterSortPlans', () => {
 
   it('maxMonthly 为 null / minRamMB 为 0 表示不限', () => {
     expect(filterSortPlans(items, { ...base, maxMonthly: null, minRamMB: 0 })).toHaveLength(4)
+  })
+
+  it('每 G 内存最划算排序(value-ram),无价/无内存排末尾', () => {
+    // 单价/GB:id1=16.99/1=16.99, id2=4.5/4=1.125, id3=10/2=5, id4=无价→Inf
+    expect(filterSortPlans(items, { ...base, sort: 'value-ram' }).map((p) => p.id)).toEqual([2, 3, 1, 4])
+  })
+})
+
+describe('pricePerGbRam', () => {
+  it('等效月价 / GB 内存', () => {
+    expect(pricePerGbRam(mk({ priceMonthly: 8, ramMB: 2048 }))).toBe(4) // 8 / 2G
+    expect(pricePerGbRam(mk({ priceYearly: 120, ramMB: 1024 }))).toBe(10) // (120/12) / 1G
+  })
+  it('缺价或缺内存为 Infinity', () => {
+    expect(pricePerGbRam(mk({ ramMB: 1024 }))).toBe(Infinity)
+    expect(pricePerGbRam(mk({ priceMonthly: 5 }))).toBe(Infinity)
   })
 })
