@@ -533,6 +533,13 @@ main {
   font-variant-numeric: tabular-nums;
 }
 
+.deal-row .exp-soon {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-warn);
+  white-space: nowrap;
+}
+
 .code-chip {
   font-family: var(--font-mono);
   font-size: var(--text-sm);
