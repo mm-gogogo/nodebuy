@@ -37,6 +37,7 @@ export default async function ProvidersPage() {
     datacenterCount: p.datacenters?.length || 0,
     cnOptimized: (p.datacenters || []).some((dc) => dc.cnOptimized),
     planCount: planCounts.get(p.id) || 0,
+    regions: [...new Set((p.datacenters || []).flatMap((dc) => (dc.region ? [dc.region] : [])))],
   }))
 
   return (

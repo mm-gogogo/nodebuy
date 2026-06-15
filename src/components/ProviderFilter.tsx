@@ -4,16 +4,32 @@ import React, { useMemo, useState } from 'react'
 import Link from 'next/link'
 
 import { ProviderMark, ScoreChip } from '@/components/ui'
-import { filterProviders, type ProviderItem } from '@/lib/providerFilter'
+import { filterSortProviders, type ProviderItem, type ProviderSort } from '@/lib/providerFilter'
+import { regionLabels } from '@/lib/labels'
+
+const SORTS: { value: ProviderSort; label: string }[] = [
+  { value: 'score', label: '综合评分 高→低' },
+  { value: 'plans', label: '在售套餐 多→少' },
+  { value: 'name', label: '名称' },
+]
 
 export function ProviderFilter({ items }: { items: ProviderItem[] }) {
   const [query, setQuery] = useState('')
   const [cnOnly, setCnOnly] = useState(false)
   const [inStockOnly, setInStockOnly] = useState(false)
+  const [region, setRegion] = useState('all')
+  const [sort, setSort] = useState<ProviderSort>('score')
+
+  // 只展示数据里出现过的区域
+  const regions = useMemo(() => {
+    const set = new Set<string>()
+    for (const it of items) for (const r of it.regions) set.add(r)
+    return [...set]
+  }, [items])
 
   const filtered = useMemo(
-    () => filterProviders(items, { query, cnOnly, inStockOnly }),
-    [items, query, cnOnly, inStockOnly],
+    () => filterSortProviders(items, { query, cnOnly, inStockOnly, region, sort }),
+    [items, query, cnOnly, inStockOnly, region, sort],
   )
 
   return (
@@ -27,6 +43,16 @@ export function ProviderFilter({ items }: { items: ProviderItem[] }) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
+        <label className="filter-sort">
+          <span className="vh">排序</span>
+          <select value={sort} onChange={(e) => setSort(e.target.value as ProviderSort)} aria-label="排序方式">
+            {SORTS.map((s) => (
+              <option key={s.value} value={s.value}>
+                {s.label}
+              </option>
+            ))}
+          </select>
+        </label>
         <button
           type="button"
           className={`filter-chip${cnOnly ? ' is-on' : ''}`}
@@ -47,6 +73,30 @@ export function ProviderFilter({ items }: { items: ProviderItem[] }) {
           {filtered.length} / {items.length}
         </span>
       </div>
+
+      {regions.length > 1 ? (
+        <div className="route-tabs" role="group" aria-label="按机房地区筛选">
+          <button
+            type="button"
+            className={`filter-chip${region === 'all' ? ' is-on' : ''}`}
+            aria-pressed={region === 'all'}
+            onClick={() => setRegion('all')}
+          >
+            全部地区
+          </button>
+          {regions.map((r) => (
+            <button
+              key={r}
+              type="button"
+              className={`filter-chip${region === r ? ' is-on' : ''}`}
+              aria-pressed={region === r}
+              onClick={() => setRegion(r)}
+            >
+              {regionLabels[r] || r}
+            </button>
+          ))}
+        </div>
+      ) : null}
 
       <ul className="provider-index">
         {filtered.map((p) => (
