@@ -1,0 +1,56 @@
+import type { PlanSort } from './planBrowse'
+
+// 套餐总览筛选状态 <-> URL query 的纯函数,服务端读取与客户端写入共用,
+// 使筛选视图可分享、可收藏、刷新后保持。
+
+export interface PlanQueryState {
+  query: string
+  route: string
+  sort: PlanSort
+  maxPrice: string // 保留字符串,空串=不限
+  minRamMB: number
+  inStockOnly: boolean
+}
+
+const VALID_SORTS: PlanSort[] = ['price-asc', 'price-desc', 'ram-desc']
+const VALID_RAM = [0, 1024, 2048, 4096, 8192]
+
+export const DEFAULT_PLAN_STATE: PlanQueryState = {
+  query: '',
+  route: 'all',
+  sort: 'price-asc',
+  maxPrice: '',
+  minRamMB: 0,
+  inStockOnly: false,
+}
+
+// 只写入非默认值,URL 尽量干净。
+export function buildPlanQuery(s: PlanQueryState): string {
+  const p = new URLSearchParams()
+  if (s.query.trim()) p.set('q', s.query.trim())
+  if (s.route && s.route !== 'all') p.set('route', s.route)
+  if (s.sort && s.sort !== 'price-asc') p.set('sort', s.sort)
+  if (s.maxPrice.trim()) p.set('max', s.maxPrice.trim())
+  if (s.minRamMB) p.set('ram', String(s.minRamMB))
+  if (s.inStockOnly) p.set('stock', '1')
+  return p.toString()
+}
+
+type RawParams = Record<string, string | string[] | undefined>
+
+function first(v: string | string[] | undefined): string | undefined {
+  return Array.isArray(v) ? v[0] : v
+}
+
+export function readPlanQuery(params: RawParams): PlanQueryState {
+  const sortRaw = first(params.sort) as PlanSort | undefined
+  const ram = Number(first(params.ram))
+  return {
+    query: first(params.q) ?? '',
+    route: first(params.route) ?? 'all',
+    sort: sortRaw && VALID_SORTS.includes(sortRaw) ? sortRaw : 'price-asc',
+    maxPrice: first(params.max) ?? '',
+    minRamMB: VALID_RAM.includes(ram) ? ram : 0,
+    inStockOnly: first(params.stock) === '1',
+  }
+}
