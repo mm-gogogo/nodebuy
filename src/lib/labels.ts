@@ -32,6 +32,13 @@ export const ispLabels: Record<string, string> = {
   cm: '移动',
 }
 
+export const regionLabels: Record<string, string> = {
+  na: '北美',
+  eu: '欧洲',
+  apac: '亚太',
+  cn: '中国大陆',
+}
+
 export const storageTypeLabels: Record<string, string> = { nvme: 'NVMe', ssd: 'SSD', hdd: 'HDD' }
 
 export function ramLabel(mb?: number | null): string {

@@ -77,6 +77,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
               <span>测评数据均为本站实测，跑分环境见各篇说明</span>
               <span className="aff-note">部分外链为推广链接（AFF），不影响测评结论</span>
               <Link href="/search">搜索</Link>
+              <Link href="/regions">机房地区</Link>
               <Link href="/favorites">我的收藏</Link>
               <Link href="/admin">管理后台</Link>
             </p>
