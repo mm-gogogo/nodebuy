@@ -4,6 +4,7 @@ import AxeBuilder from '@axe-core/playwright'
 // 扫描核心页面的 WCAG 2.0/2.1 A & AA 违规。
 const pages: Array<{ name: string; path: string }> = [
   { name: '首页', path: '/' },
+  { name: '选购助手', path: '/guide' },
   { name: '榜单列表', path: '/rankings' },
   { name: '榜单详情', path: '/rankings/best-value' },
   { name: '测评列表', path: '/reviews' },
