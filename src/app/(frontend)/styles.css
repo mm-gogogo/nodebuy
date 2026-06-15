@@ -765,6 +765,17 @@ main {
   border-bottom-color: var(--color-accent);
 }
 
+/* 按钮型链接放进正文时，不要被 .prose a 的强调样式覆盖 —— 否则会变成
+   暗底上的蓝字（对比度不足 / 失败 WCAG AA）且多出一条下划线。 */
+.prose a.btn-ink {
+  color: var(--color-on-ink);
+  border-bottom: none;
+}
+.prose a.btn-ghost {
+  color: var(--color-ink);
+  border-bottom: none;
+}
+
 /* ———— spec/bench tables ———— */
 .bench-table {
   width: 100%;
