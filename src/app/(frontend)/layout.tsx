@@ -32,6 +32,9 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {/* 刻意用 <link> 而非 next/font：字体含 Noto Sans SC（CJK），用 next/font 自托管会
+            把数 MB 的中文字体打进构建产物；交给 Google 按子集分发更合适。 */}
+        {/* eslint-disable-next-line @next/next/no-page-custom-font */}
         <link
           href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono:wght@400..700&family=Noto+Sans+SC:wght@400..700&display=swap"
           rel="stylesheet"
