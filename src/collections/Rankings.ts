@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { validateSlug } from '../lib/slug'
 
 export const Rankings: CollectionConfig = {
   slug: 'rankings',
@@ -11,7 +12,7 @@ export const Rankings: CollectionConfig = {
   access: { read: () => true },
   fields: [
     { name: 'title', label: '榜单标题', type: 'text', required: true },
-    { name: 'slug', label: 'Slug', type: 'text', required: true, unique: true, index: true },
+    { name: 'slug', label: 'Slug', type: 'text', required: true, unique: true, index: true, validate: validateSlug },
     {
       name: 'category',
       label: '分类',
