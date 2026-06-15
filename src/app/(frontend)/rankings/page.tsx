@@ -3,7 +3,9 @@ import Link from 'next/link'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 
+import { ProviderMark } from '@/components/ui'
 import { categoryDescriptions, categoryLabels, fmtDate } from '@/lib/labels'
+import { rankingLeader } from '@/lib/rankings'
 
 export const revalidate = 60
 
@@ -21,17 +23,26 @@ export default async function RankingsPage() {
       </header>
       <section className="rail--tight">
         <ul className="cat-list">
-          {rankings.docs.map((r) => (
-            <li key={r.id}>
-              <Link href={`/rankings/${r.slug}`}>
-                <span className="t">{r.title}</span>
-                <span className="d">{r.description || categoryDescriptions[r.category] || categoryLabels[r.category]}</span>
-                <span className="d">
-                  {(r.items || []).length} 个上榜 · 更新于 {fmtDate(r.updatedAt)}
-                </span>
-              </Link>
-            </li>
-          ))}
+          {rankings.docs.map((r) => {
+            const leader = rankingLeader(r)
+            return (
+              <li key={r.id}>
+                <Link href={`/rankings/${r.slug}`}>
+                  <span className="t">{r.title}</span>
+                  <span className="d">{r.description || categoryDescriptions[r.category] || categoryLabels[r.category]}</span>
+                  {leader ? (
+                    <span className="cat-leader">
+                      <ProviderMark name={leader.name} brandColor={leader.brandColor} />
+                      <span><span className="k">榜首</span> {leader.name}</span>
+                    </span>
+                  ) : null}
+                  <span className="d">
+                    {(r.items || []).length} 个上榜 · 更新于 {fmtDate(r.updatedAt)}
+                  </span>
+                </Link>
+              </li>
+            )
+          })}
         </ul>
       </section>
     </div>
