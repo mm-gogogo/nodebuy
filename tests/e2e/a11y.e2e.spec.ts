@@ -8,6 +8,7 @@ const pages: Array<{ name: string; path: string }> = [
   { name: '榜单详情', path: '/rankings/best-value' },
   { name: '测评列表', path: '/reviews' },
   { name: '测评详情', path: '/reviews/bandwagonhost-cn2-gia-e-dc6-review' },
+  { name: '套餐总览', path: '/plans' },
   { name: '服务商索引', path: '/providers' },
   { name: '服务商详情', path: '/providers/bandwagonhost' },
   { name: '优惠速递', path: '/deals' },
