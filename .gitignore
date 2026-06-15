@@ -24,6 +24,10 @@
 *.pem
 .hallmark/
 
+# claude code 运行时状态
+.claude/*.lock
+.claude/scheduled_tasks.lock
+
 # debug
 npm-debug.log*
 yarn-debug.log*
