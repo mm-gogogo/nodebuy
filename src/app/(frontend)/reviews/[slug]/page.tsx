@@ -7,6 +7,8 @@ import config from '@payload-config'
 import { RichText } from '@payloadcms/richtext-lexical/react'
 
 import { AffButton, ScoreBars } from '@/components/ui'
+import { JsonLd } from '@/components/JsonLd'
+import { breadcrumbList } from '@/lib/jsonld'
 import { fmtDate, ispLabels, specLine } from '@/lib/labels'
 
 export const revalidate = 60
@@ -76,9 +78,16 @@ export default async function ReviewDetail({ params }: { params: Promise<{ slug:
         : undefined,
   }
 
+  const crumbs = breadcrumbList([
+    { name: '首页', path: '/' },
+    { name: '测评', path: '/reviews' },
+    { name: review.title, path: `/reviews/${slug}` },
+  ])
+
   return (
     <div className="wrap">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <JsonLd data={jsonLd} />
+      <JsonLd data={crumbs} />
       <header className="article-head">
         <h1>{review.title}</h1>
         <div className="meta">
