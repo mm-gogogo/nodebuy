@@ -8,8 +8,8 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        // AFF 跳转与后台/API 不进索引
-        disallow: ['/admin', '/api/', '/go/'],
+        // AFF 跳转、后台/API、搜索结果页不进索引
+        disallow: ['/admin', '/api/', '/go/', '/search'],
       },
     ],
     sitemap: `${siteUrl}/sitemap.xml`,
