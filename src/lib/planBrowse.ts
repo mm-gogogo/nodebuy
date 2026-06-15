@@ -18,7 +18,7 @@ export interface PlanItem {
   inStock: boolean
 }
 
-export type PlanSort = 'price-asc' | 'price-desc' | 'ram-desc' | 'value-ram'
+export type PlanSort = 'price-asc' | 'price-desc' | 'ram-desc' | 'value-ram' | 'value-storage'
 
 export interface PlanBrowseState {
   query: string
@@ -43,6 +43,13 @@ export function pricePerGbRam(plan: PlanItem): number {
   return m / (plan.ramMB / 1024)
 }
 
+// 每 GB 硬盘的等效月价($/G硬盘),面向存储型买家;缺价或缺硬盘视为无穷大(排末尾)。
+export function pricePerGbStorage(plan: PlanItem): number {
+  const m = effectiveMonthly(plan)
+  if (!Number.isFinite(m) || !plan.storageGB) return Infinity
+  return m / plan.storageGB
+}
+
 export function filterSortPlans(items: PlanItem[], state: PlanBrowseState): PlanItem[] {
   const q = state.query.trim().toLowerCase()
   const filtered = items.filter((p) => {
@@ -60,11 +67,12 @@ export function filterSortPlans(items: PlanItem[], state: PlanBrowseState): Plan
   const sorted = [...filtered]
   if (state.sort === 'ram-desc') {
     sorted.sort((a, b) => (b.ramMB ?? 0) - (a.ramMB ?? 0))
-  } else if (state.sort === 'value-ram') {
-    // 每 G 内存最划算:升序,无穷大(缺价/缺内存)排最后
+  } else if (state.sort === 'value-ram' || state.sort === 'value-storage') {
+    // 每 G 资源最划算:升序,无穷大(缺价/缺资源)排最后
+    const metric = state.sort === 'value-storage' ? pricePerGbStorage : pricePerGbRam
     sorted.sort((a, b) => {
-      const va = pricePerGbRam(a)
-      const vb = pricePerGbRam(b)
+      const va = metric(a)
+      const vb = metric(b)
       const aInf = !Number.isFinite(va)
       const bInf = !Number.isFinite(vb)
       if (aInf && bInf) return 0
