@@ -1,6 +1,8 @@
 import React from 'react'
 import Link from 'next/link'
 
+import { isHexColor } from '@/lib/color'
+
 export function ProviderMark({
   name,
   brandColor,
@@ -11,10 +13,12 @@ export function ProviderMark({
   large?: boolean
 }) {
   const letter = name.replace(/^搬瓦工\s*/, 'B').charAt(0).toUpperCase()
+  // 仅在确为合法 hex 时采用，否则回落到默认底色，避免非法值被浏览器丢弃后白字白底不可见
+  const background = brandColor && isHexColor(brandColor) ? brandColor : 'var(--color-ink)'
   return (
     <span
       className={`p-mark${large ? ' p-mark--lg' : ''}`}
-      style={{ background: brandColor || 'var(--color-ink)' }}
+      style={{ background }}
       aria-hidden="true"
     >
       {letter}

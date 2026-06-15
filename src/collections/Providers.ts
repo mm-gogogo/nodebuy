@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { validateSlug } from '../lib/slug'
+import { validateHexColor } from '../lib/color'
 
 export const Providers: CollectionConfig = {
   slug: 'providers',
@@ -22,7 +23,8 @@ export const Providers: CollectionConfig = {
       name: 'brandColor',
       label: '品牌色 (hex)',
       type: 'text',
-      admin: { description: '无 Logo 时用于生成字母徽标底色' },
+      validate: validateHexColor,
+      admin: { description: '无 Logo 时用于生成字母徽标底色，如 #2b6cb0' },
     },
     { name: 'founded', label: '成立年份', type: 'number' },
     { name: 'headquarters', label: '总部', type: 'text' },
