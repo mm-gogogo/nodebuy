@@ -7,6 +7,7 @@ import { AffButton, ProviderMark, RailHead, ScoreChip } from '@/components/ui'
 import { CopyCode } from '@/components/CopyCode'
 import { categoryDescriptions, categoryLabels, fmtDate, priceLine, routeLabels, specLine } from '@/lib/labels'
 import { activeDealsWhere } from '@/lib/queries'
+import { expiryUrgency } from '@/lib/deals'
 
 export const revalidate = 60
 
@@ -146,6 +147,7 @@ export default async function HomePage() {
         <div role="list">
           {deals.docs.map((d) => {
             const provider = typeof d.provider === 'object' ? d.provider : null
+            const soon = expiryUrgency(d.expiresAt)
             return (
               <div role="listitem" className="deal-row" key={d.id}>
                 <div className="grow">
@@ -153,6 +155,7 @@ export default async function HomePage() {
                   {d.discount ? <span className="d">　{d.discount}</span> : null}
                 </div>
                 {d.code ? <CopyCode code={d.code} /> : null}
+                {soon ? <span className="exp-soon">⏳ {soon}</span> : null}
                 {d.expiresAt ? <span className="exp">截至 {fmtDate(d.expiresAt)}</span> : null}
                 {provider ? <AffButton slug={provider.slug} dealId={d.id} label="去下单" /> : null}
               </div>

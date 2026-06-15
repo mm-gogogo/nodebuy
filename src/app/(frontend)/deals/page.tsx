@@ -6,6 +6,7 @@ import { AffButton } from '@/components/ui'
 import { CopyCode } from '@/components/CopyCode'
 import { fmtDate } from '@/lib/labels'
 import { activeDealsWhere } from '@/lib/queries'
+import { expiryUrgency } from '@/lib/deals'
 
 export const revalidate = 60
 
@@ -25,6 +26,7 @@ export default async function DealsPage() {
         <div role="list">
           {deals.docs.map((d) => {
             const provider = typeof d.provider === 'object' ? d.provider : null
+            const soon = expiryUrgency(d.expiresAt)
             return (
               <div role="listitem" className="deal-row" key={d.id}>
                 <div className="grow">
@@ -33,6 +35,7 @@ export default async function DealsPage() {
                 </div>
                 {d.discount ? <span className="badge badge--accent">{d.discount}</span> : null}
                 {d.code ? <CopyCode code={d.code} /> : null}
+                {soon ? <span className="exp-soon">⏳ {soon}</span> : null}
                 {d.expiresAt ? <span className="exp">截至 {fmtDate(d.expiresAt)}</span> : null}
                 {provider ? <AffButton slug={provider.slug} dealId={d.id} label="去下单" /> : null}
               </div>
