@@ -1,10 +1,12 @@
 'use client'
 
 import React, { useMemo, useState } from 'react'
+import Link from 'next/link'
 
 import { AffButton, ProviderMark } from '@/components/ui'
 import { priceLine, routeLabels, specLine } from '@/lib/labels'
 import { filterSortPlans, type PlanItem, type PlanSort } from '@/lib/planBrowse'
+import { MAX_COMPARE } from '@/lib/compare'
 
 const SORTS: { value: PlanSort; label: string }[] = [
   { value: 'price-asc', label: '价格 低→高' },
@@ -17,6 +19,12 @@ export function PlanBrowser({ items }: { items: PlanItem[] }) {
   const [route, setRoute] = useState('all')
   const [sort, setSort] = useState<PlanSort>('price-asc')
   const [inStockOnly, setInStockOnly] = useState(false)
+  const [selected, setSelected] = useState<number[]>([])
+
+  const atMax = selected.length >= MAX_COMPARE
+  function toggleCompare(id: number) {
+    setSelected((cur) => (cur.includes(id) ? cur.filter((x) => x !== id) : cur.length >= MAX_COMPARE ? cur : [...cur, id]))
+  }
 
   // 只展示数据里实际出现过的线路
   const routes = useMemo(() => {
@@ -105,6 +113,21 @@ export function PlanBrowser({ items }: { items: PlanItem[] }) {
                 <strong>{price.amount}</strong>
                 {price.cycle}
               </span>
+              {(() => {
+                const on = selected.includes(p.id)
+                return (
+                  <button
+                    type="button"
+                    className={`cmp-toggle${on ? ' is-on' : ''}`}
+                    aria-pressed={on}
+                    disabled={!on && atMax}
+                    onClick={() => toggleCompare(p.id)}
+                    title={!on && atMax ? `最多对比 ${MAX_COMPARE} 个` : '加入对比'}
+                  >
+                    {on ? '✓ 已选' : '对比'}
+                  </button>
+                )
+              })()}
               {p.inStock ? (
                 <AffButton slug={p.providerSlug} planId={p.id} label="入手" />
               ) : (
@@ -115,6 +138,20 @@ export function PlanBrowser({ items }: { items: PlanItem[] }) {
         })}
       </ul>
       {shown.length === 0 ? <p className="empty-note">没有符合条件的套餐,换个筛选试试。</p> : null}
+
+      {selected.length > 0 ? (
+        <div className="compare-bar" role="region" aria-label="对比栏">
+          <span className="cmp-count">
+            已选 {selected.length}/{MAX_COMPARE} 个套餐
+          </span>
+          <button type="button" className="btn-ghost" onClick={() => setSelected([])}>
+            清空
+          </button>
+          <Link className="btn-ink" href={`/compare?plans=${selected.join(',')}`}>
+            对比这些套餐 →
+          </Link>
+        </div>
+      ) : null}
     </>
   )
 }
