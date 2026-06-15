@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { validateSlug } from '../lib/slug'
 
 export const Providers: CollectionConfig = {
   slug: 'providers',
@@ -11,7 +12,7 @@ export const Providers: CollectionConfig = {
   access: { read: () => true },
   fields: [
     { name: 'name', label: '名称', type: 'text', required: true },
-    { name: 'slug', label: 'Slug', type: 'text', required: true, unique: true, index: true },
+    { name: 'slug', label: 'Slug', type: 'text', required: true, unique: true, index: true, validate: validateSlug },
     { name: 'tagline', label: '一句话定位', type: 'text' },
     { name: 'description', label: '简介', type: 'textarea' },
     { name: 'website', label: '官网', type: 'text' },

@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { validateSlug } from '../lib/slug'
 
 export const Reviews: CollectionConfig = {
   slug: 'reviews',
@@ -12,7 +13,7 @@ export const Reviews: CollectionConfig = {
   versions: { drafts: true },
   fields: [
     { name: 'title', label: '标题', type: 'text', required: true },
-    { name: 'slug', label: 'Slug', type: 'text', required: true, unique: true, index: true },
+    { name: 'slug', label: 'Slug', type: 'text', required: true, unique: true, index: true, validate: validateSlug },
     { name: 'provider', label: '服务商', type: 'relationship', relationTo: 'providers', required: true },
     { name: 'plan', label: '关联套餐', type: 'relationship', relationTo: 'plans' },
     { name: 'excerpt', label: '摘要', type: 'textarea' },
