@@ -6,6 +6,8 @@ import { getPayload } from 'payload'
 import config from '@payload-config'
 
 import { AffButton, ProviderMark, RailHead, ScoreBars } from '@/components/ui'
+import { JsonLd } from '@/components/JsonLd'
+import { breadcrumbList } from '@/lib/jsonld'
 import { fmtDate, priceLine, routeLabels, specLine } from '@/lib/labels'
 
 export const revalidate = 60
@@ -54,8 +56,15 @@ export default async function ProviderDetail({ params }: { params: Promise<{ slu
     unionpay: '银联',
   }
 
+  const crumbs = breadcrumbList([
+    { name: '首页', path: '/' },
+    { name: '服务商', path: '/providers' },
+    { name: provider.name, path: `/providers/${slug}` },
+  ])
+
   return (
     <div className="wrap">
+      <JsonLd data={crumbs} />
       <header className="article-head">
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)', flexWrap: 'wrap' }}>
           <ProviderMark name={provider.name} brandColor={provider.brandColor} large />
