@@ -4,6 +4,7 @@ import config from '@payload-config'
 
 import { ProviderFilter } from '@/components/ProviderFilter'
 import type { ProviderItem } from '@/lib/providerFilter'
+import { readProviderQuery } from '@/lib/providerQuery'
 
 export const revalidate = 60
 
@@ -12,7 +13,12 @@ export const metadata = {
   description: '按综合评分排序的全部收录服务商，含机房分布、大陆优化线路与在售套餐数，支持搜索与筛选。',
 }
 
-export default async function ProvidersPage() {
+export default async function ProvidersPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>
+}) {
+  const initial = readProviderQuery(await searchParams)
   const payload = await getPayload({ config })
   const [providers, plans] = await Promise.all([
     payload.find({ collection: 'providers', limit: 200, sort: '-overallScore' }),
@@ -62,7 +68,7 @@ export default async function ProvidersPage() {
         {items.length === 0 ? (
           <p className="empty-note">暂未收录服务商。</p>
         ) : (
-          <ProviderFilter items={items} />
+          <ProviderFilter items={items} initial={initial} />
         )}
       </section>
     </div>
