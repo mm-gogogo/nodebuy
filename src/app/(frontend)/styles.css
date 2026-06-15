@@ -15,6 +15,10 @@ body {
 html {
   -webkit-font-smoothing: antialiased;
   scroll-behavior: smooth;
+  color-scheme: light;
+}
+html[data-theme='dark'] {
+  color-scheme: dark;
 }
 
 body {
@@ -130,6 +134,29 @@ a {
   outline: 2px solid var(--color-accent);
   outline-offset: 1px;
   width: 9rem;
+}
+
+.theme-toggle {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  font-size: var(--text-base);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-ink-soft);
+  cursor: pointer;
+  transition: border-color var(--dur-short) var(--ease-out);
+}
+.theme-toggle:hover {
+  border-color: var(--color-rule-strong);
+}
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
 }
 
 @media (max-width: 480px) {

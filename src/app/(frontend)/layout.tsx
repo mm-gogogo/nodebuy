@@ -3,6 +3,8 @@ import Link from 'next/link'
 import './styles.css'
 
 import type { Metadata } from 'next'
+import { ThemeToggle } from '@/components/ThemeToggle'
+import { THEME_INIT_SCRIPT } from '@/lib/theme'
 
 const siteUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
 
@@ -28,8 +30,9 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
   const { children } = props
 
   return (
-    <html lang="zh-CN">
+    <html lang="zh-CN" suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         {/* 刻意用 <link> 而非 next/font：字体含 Noto Sans SC（CJK），用 next/font 自托管会
@@ -71,6 +74,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
           <form className="nav-search" action="/search" role="search">
             <input type="search" name="q" placeholder="搜索…" aria-label="站内搜索" />
           </form>
+          <ThemeToggle />
         </nav>
         <main>{children}</main>
         <footer className="foot-line">
