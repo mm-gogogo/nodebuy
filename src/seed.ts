@@ -1,4 +1,4 @@
-/* eslint-disable no-console */
+/* eslint-disable @typescript-eslint/no-explicit-any -- 种子脚本对演示数据使用宽松类型，避免为一次性 fixture 写大量接口 */
 // 种子数据：npx tsx src/seed.ts （payload run 无法解析 @payload-config 别名，会静默失败）
 // 数据为演示用途，价格与跑分为编辑整理的典型值。
 import 'dotenv/config'
