@@ -15,7 +15,8 @@ export default async function HomePage() {
 
   const [providers, plans, reviews, rankings, deals] = await Promise.all([
     payload.find({ collection: 'providers', limit: 100, sort: '-overallScore' }),
-    payload.find({ collection: 'plans', limit: 0 }),
+    // 首页只用套餐总数,不需要套餐列表 —— 用 count 避免拉取并 populate 整个集合
+    payload.count({ collection: 'plans' }),
     payload.find({ collection: 'reviews', limit: 7, sort: '-publishedAt', where: { _status: { equals: 'published' } } }),
     payload.find({ collection: 'rankings', limit: 20, sort: 'createdAt' }),
     payload.find({ collection: 'deals', limit: 6, sort: '-featured', where: activeDealsWhere() }),
