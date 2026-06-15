@@ -2,7 +2,7 @@ import { getPayload } from 'payload'
 import config from '@payload-config'
 import { NextRequest, NextResponse } from 'next/server'
 
-import { resolveAffTarget, type AffDeal, type AffPlan } from '@/lib/aff'
+import { normalizeAffUrl, resolveAffTarget, type AffDeal, type AffPlan } from '@/lib/aff'
 
 // AFF 跳转：/go/<provider-slug>[?plan=<id>][?deal=<id>] → 302 到推广链接。
 // 优先级：优惠级 url > 套餐级 affUrl > 服务商 affUrl > 服务商官网。
@@ -38,7 +38,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
     }
   }
 
-  const target = resolveAffTarget(provider, plan, deal)
+  // 收敛为绝对 http(s) URL；非法或缺失时回落到服务商页，避免 redirect 抛错 500。
+  const target = normalizeAffUrl(resolveAffTarget(provider, plan, deal))
   if (!target) return NextResponse.redirect(new URL(`/providers/${slug}`, req.url), 302)
   return NextResponse.redirect(target, 302)
 }

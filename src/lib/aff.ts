@@ -25,3 +25,23 @@ export function resolveAffTarget(
   if (deal?.url) target = deal.url
   return target
 }
+
+// 把后台可能填得不规范的链接收敛成可安全 302 的绝对 http(s) URL。
+// 处理：已是绝对 URL 直接用；协议相对 //x → https:；裸域名 x.com/... → 补 https://。
+// 无法收敛为 http(s) 的返回 null（调用方回落到服务商页，避免 NextResponse.redirect 抛错 500）。
+export function normalizeAffUrl(raw: string | null | undefined): string | null {
+  if (!raw) return null
+  let candidate = raw.trim()
+  if (!candidate) return null
+
+  if (candidate.startsWith('//')) candidate = `https:${candidate}`
+  else if (!/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(candidate)) candidate = `https://${candidate}`
+
+  try {
+    const url = new URL(candidate)
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') return null
+    return url.toString()
+  } catch {
+    return null
+  }
+}
