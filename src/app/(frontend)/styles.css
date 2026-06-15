@@ -766,6 +766,33 @@ main {
 }
 
 /* ———— article / detail pages ———— */
+/* ———— provider ranking appearances ———— */
+.ranking-appearances {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+.ranking-appearance {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  padding: var(--space-2xs) var(--space-sm);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-sm);
+  color: var(--color-ink-soft);
+  transition: border-color var(--dur-short) var(--ease-out);
+}
+.ranking-appearance:hover {
+  border-color: var(--color-rule-strong);
+}
+.ranking-appearance .rank-pos {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-accent);
+}
+
 /* ———— breadcrumbs ———— */
 .breadcrumbs {
   padding-top: var(--space-xl);
