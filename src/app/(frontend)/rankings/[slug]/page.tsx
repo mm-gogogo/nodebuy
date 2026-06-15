@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 
-import { AffButton, ProviderMark, ScoreChip } from '@/components/ui'
+import { AffButton, Breadcrumbs, ProviderMark, ScoreChip } from '@/components/ui'
 import { JsonLd } from '@/components/JsonLd'
 import { breadcrumbList } from '@/lib/jsonld'
 import { categoryDescriptions, categoryLabels, fmtDate, priceLine, routeLabels, specLine } from '@/lib/labels'
@@ -34,15 +34,16 @@ export default async function RankingDetail({ params }: { params: Promise<{ slug
   const ranking = await getRanking(slug)
   if (!ranking) notFound()
 
-  const crumbs = breadcrumbList([
+  const crumbs = [
     { name: '首页', path: '/' },
     { name: '榜单', path: '/rankings' },
     { name: ranking.title, path: `/rankings/${slug}` },
-  ])
+  ]
 
   return (
     <div className="wrap">
-      <JsonLd data={crumbs} />
+      <JsonLd data={breadcrumbList(crumbs)} />
+      <Breadcrumbs crumbs={crumbs} />
       <header className="article-head">
         <h1>{ranking.title}</h1>
         <div className="meta">

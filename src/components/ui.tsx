@@ -2,6 +2,30 @@ import React from 'react'
 import Link from 'next/link'
 
 import { isHexColor } from '@/lib/color'
+import type { Crumb } from '@/lib/jsonld'
+
+// 可见面包屑导航,与详情页的 BreadcrumbList JSON-LD 对应。
+// 最后一项为当前页,不可点击并标记 aria-current。
+export function Breadcrumbs({ crumbs }: { crumbs: Crumb[] }) {
+  return (
+    <nav className="breadcrumbs" aria-label="面包屑">
+      <ol>
+        {crumbs.map((c, i) => {
+          const isLast = i === crumbs.length - 1
+          return (
+            <li key={c.path}>
+              {isLast ? (
+                <span aria-current="page">{c.name}</span>
+              ) : (
+                <Link href={c.path}>{c.name}</Link>
+              )}
+            </li>
+          )
+        })}
+      </ol>
+    </nav>
+  )
+}
 
 export function ProviderMark({
   name,
