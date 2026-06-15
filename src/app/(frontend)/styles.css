@@ -942,12 +942,14 @@ main {
 .fav-actions {
   margin-bottom: var(--space-lg);
 }
-.fav-list li {
+.fav-list li,
+.provider-index--selectable li {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
 }
-.fav-list li > a {
+.fav-list li > a,
+.provider-index--selectable li > a {
   flex: 1;
   min-width: 0;
 }

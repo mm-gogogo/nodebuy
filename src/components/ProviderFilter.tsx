@@ -6,7 +6,10 @@ import Link from 'next/link'
 import { ProviderMark, ScoreChip } from '@/components/ui'
 import { filterSortProviders, type ProviderItem, type ProviderSort } from '@/lib/providerFilter'
 import { buildProviderQuery, DEFAULT_PROVIDER_STATE, type ProviderQueryState } from '@/lib/providerQuery'
+import { toggleCapped } from '@/lib/selection'
 import { payLabels, regionLabels } from '@/lib/labels'
+
+const MAX_COMPARE = 4
 
 const SORTS: { value: ProviderSort; label: string }[] = [
   { value: 'score', label: '综合评分 高→低' },
@@ -23,6 +26,9 @@ export function ProviderFilter({ items, initial }: { items: ProviderItem[]; init
   const [region, setRegion] = useState(init.region)
   const [payment, setPayment] = useState(init.payment)
   const [sort, setSort] = useState<ProviderSort>(init.sort)
+  const [selected, setSelected] = useState<string[]>([])
+
+  const atMax = selected.length >= MAX_COMPARE
 
   // 同步筛选状态到 URL(history.replaceState,纯客户端、不触发重新请求)
   useEffect(() => {
@@ -129,31 +135,58 @@ export function ProviderFilter({ items, initial }: { items: ProviderItem[]; init
         </div>
       ) : null}
 
-      <ul className="provider-index">
-        {filtered.map((p) => (
-          <li key={p.id}>
-            <Link href={`/providers/${p.slug}`}>
-              <ProviderMark name={p.name} brandColor={p.brandColor} />
-              <span className="grow">
-                <span className="name">
-                  {p.name}
-                  {p.cnOptimized ? <span className="badge badge--accent">大陆优化</span> : null}
+      <ul className="provider-index provider-index--selectable">
+        {filtered.map((p) => {
+          const on = selected.includes(p.slug)
+          return (
+            <li key={p.id}>
+              <Link href={`/providers/${p.slug}`}>
+                <ProviderMark name={p.name} brandColor={p.brandColor} />
+                <span className="grow">
+                  <span className="name">
+                    {p.name}
+                    {p.cnOptimized ? <span className="badge badge--accent">大陆优化</span> : null}
+                  </span>
+                  <span className="sub">{p.tagline || p.headquarters || ''}</span>
                 </span>
-                <span className="sub">{p.tagline || p.headquarters || ''}</span>
-              </span>
-              <span className="facts">
-                {p.startingMonthly != null ? (
-                  <span>起步 ${Math.round(p.startingMonthly * 100) / 100}/月</span>
-                ) : null}
-                {p.datacenterCount ? <span>{p.datacenterCount} 个机房</span> : null}
-                {p.planCount ? <span>{p.planCount} 个在售套餐</span> : null}
-              </span>
-              <ScoreChip score={p.overallScore} />
-            </Link>
-          </li>
-        ))}
+                <span className="facts">
+                  {p.startingMonthly != null ? (
+                    <span>起步 ${Math.round(p.startingMonthly * 100) / 100}/月</span>
+                  ) : null}
+                  {p.datacenterCount ? <span>{p.datacenterCount} 个机房</span> : null}
+                  {p.planCount ? <span>{p.planCount} 个在售套餐</span> : null}
+                </span>
+                <ScoreChip score={p.overallScore} />
+              </Link>
+              <button
+                type="button"
+                className={`cmp-toggle${on ? ' is-on' : ''}`}
+                aria-pressed={on}
+                disabled={!on && atMax}
+                onClick={() => setSelected((cur) => toggleCapped(cur, p.slug, MAX_COMPARE))}
+                title={!on && atMax ? `最多对比 ${MAX_COMPARE} 家` : '加入对比'}
+              >
+                {on ? '✓ 已选' : '对比'}
+              </button>
+            </li>
+          )
+        })}
       </ul>
       {filtered.length === 0 ? <p className="empty-note">没有符合条件的服务商，换个关键词试试。</p> : null}
+
+      {selected.length > 0 ? (
+        <div className="compare-bar" role="region" aria-label="对比栏">
+          <span className="cmp-count">
+            已选 {selected.length}/{MAX_COMPARE} 家服务商
+          </span>
+          <button type="button" className="btn-ghost" onClick={() => setSelected([])}>
+            清空
+          </button>
+          <Link className="btn-ink" href={`/compare-providers?slugs=${selected.join(',')}`}>
+            对比这些服务商 →
+          </Link>
+        </div>
+      ) : null}
     </>
   )
 }
