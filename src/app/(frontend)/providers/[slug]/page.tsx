@@ -8,7 +8,8 @@ import config from '@payload-config'
 import { AffButton, Breadcrumbs, ProviderMark, RailHead, ScoreBars } from '@/components/ui'
 import { JsonLd } from '@/components/JsonLd'
 import { breadcrumbList } from '@/lib/jsonld'
-import { fmtDate, priceLine, routeLabels, specLine } from '@/lib/labels'
+import { findProviderRankings, type RankingLite } from '@/lib/providerRankings'
+import { categoryLabels, fmtDate, priceLine, routeLabels, specLine } from '@/lib/labels'
 
 export const revalidate = 60
 
@@ -37,7 +38,7 @@ export default async function ProviderDetail({ params }: { params: Promise<{ slu
   if (!provider) notFound()
 
   const payload = await getPayload({ config })
-  const [plans, reviews] = await Promise.all([
+  const [plans, reviews, rankings] = await Promise.all([
     payload.find({ collection: 'plans', where: { provider: { equals: provider.id } }, limit: 50, sort: 'priceYearly' }),
     payload.find({
       collection: 'reviews',
@@ -45,7 +46,10 @@ export default async function ProviderDetail({ params }: { params: Promise<{ slu
       limit: 20,
       sort: '-publishedAt',
     }),
+    payload.find({ collection: 'rankings', limit: 50, depth: 0 }),
   ])
+
+  const appearances = findProviderRankings(rankings.docs as RankingLite[], provider.id)
 
   const payLabels: Record<string, string> = {
     alipay: '支付宝',
@@ -94,6 +98,19 @@ export default async function ProviderDetail({ params }: { params: Promise<{ slu
       {provider.scores ? (
         <section className="rail--tight" style={{ paddingTop: 0 }}>
           <ScoreBars scores={provider.scores} />
+        </section>
+      ) : null}
+
+      {appearances.length ? (
+        <section className="rail--tight" style={{ paddingTop: 0 }}>
+          <p className="ranking-appearances">
+            {appearances.map((a) => (
+              <Link key={a.slug} href={`/rankings/${a.slug}`} className="ranking-appearance">
+                <span className="rank-pos">#{a.position}</span>
+                <span>{categoryLabels[a.category] || a.title}</span>
+              </Link>
+            ))}
+          </p>
         </section>
       ) : null}
 
