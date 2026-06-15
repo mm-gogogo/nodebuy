@@ -31,8 +31,16 @@ export function FavoritesList({ items }: { items: FavProvider[] }) {
   const ordered = favs.map((slug) => shown.find((it) => it.slug === slug)).filter((x): x is FavProvider => Boolean(x))
 
   return (
-    <ul className="provider-index fav-list">
-      {ordered.map((p) => (
+    <>
+      {ordered.length >= 2 ? (
+        <div className="fav-actions">
+          <Link className="btn-ink" href={`/compare-providers?slugs=${ordered.slice(0, 4).map((p) => p.slug).join(',')}`}>
+            对比已收藏服务商（最多 4 家）→
+          </Link>
+        </div>
+      ) : null}
+      <ul className="provider-index fav-list">
+        {ordered.map((p) => (
         <li key={p.slug}>
           <Link href={`/providers/${p.slug}`}>
             <ProviderMark name={p.name} brandColor={p.brandColor} />
@@ -44,7 +52,8 @@ export function FavoritesList({ items }: { items: FavProvider[] }) {
           </Link>
           <FavoriteButton slug={p.slug} name={p.name} />
         </li>
-      ))}
-    </ul>
+        ))}
+      </ul>
+    </>
   )
 }

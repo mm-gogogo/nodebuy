@@ -39,6 +39,15 @@ export const regionLabels: Record<string, string> = {
   cn: '中国大陆',
 }
 
+export const payLabels: Record<string, string> = {
+  alipay: '支付宝',
+  wechat: '微信支付',
+  paypal: 'PayPal',
+  card: '信用卡',
+  crypto: '加密货币',
+  unionpay: '银联',
+}
+
 export const storageTypeLabels: Record<string, string> = { nvme: 'NVMe', ssd: 'SSD', hdd: 'HDD' }
 
 export function ramLabel(mb?: number | null): string {
