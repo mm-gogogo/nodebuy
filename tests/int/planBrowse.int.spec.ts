@@ -58,4 +58,27 @@ describe('filterSortPlans', () => {
       filterSortPlans(items, { query: '', route: 'cn2gia', sort: 'price-asc', inStockOnly: true }).map((p) => p.id),
     ).toEqual([1])
   })
+
+  it('月价上限按等效月价过滤(无价被排除)', () => {
+    // 等效月价:id2=4.5, id3=10, id1=16.99, id4=Infinity
+    expect(filterSortPlans(items, { ...base, maxMonthly: 11 }).map((p) => p.id).sort()).toEqual([2, 3])
+    expect(filterSortPlans(items, { ...base, maxMonthly: 5 }).map((p) => p.id)).toEqual([2])
+    expect(filterSortPlans(items, { ...base, maxMonthly: 999 }).map((p) => p.id).sort()).toEqual([1, 2, 3]) // id4 无价仍排除
+  })
+
+  it('内存下限过滤', () => {
+    // ramMB: id1=1024, id2=4096, id3=2048, id4=1024
+    expect(filterSortPlans(items, { ...base, minRamMB: 2048 }).map((p) => p.id).sort()).toEqual([2, 3])
+    expect(filterSortPlans(items, { ...base, minRamMB: 4096 }).map((p) => p.id)).toEqual([2])
+  })
+
+  it('月价 + 内存 + 线路 叠加', () => {
+    expect(
+      filterSortPlans(items, { ...base, route: 'cn2gia', maxMonthly: 20, minRamMB: 2048 }).map((p) => p.id),
+    ).toEqual([3])
+  })
+
+  it('maxMonthly 为 null / minRamMB 为 0 表示不限', () => {
+    expect(filterSortPlans(items, { ...base, maxMonthly: null, minRamMB: 0 })).toHaveLength(4)
+  })
 })

@@ -25,6 +25,8 @@ export interface PlanBrowseState {
   route: string // 'all' 或具体线路值
   sort: PlanSort
   inStockOnly: boolean
+  maxMonthly?: number | null // 等效月价上限($/月),null/未填=不限
+  minRamMB?: number // 内存下限(MB),0/未填=不限
 }
 
 // 归一为「等效月价」用于排序:优先月付,否则年付/12;都没有则视为无穷大(排末尾)。
@@ -39,6 +41,8 @@ export function filterSortPlans(items: PlanItem[], state: PlanBrowseState): Plan
   const filtered = items.filter((p) => {
     if (state.inStockOnly && !p.inStock) return false
     if (state.route !== 'all' && p.route !== state.route) return false
+    if (state.maxMonthly != null && effectiveMonthly(p) > state.maxMonthly) return false
+    if (state.minRamMB && (p.ramMB ?? 0) < state.minRamMB) return false
     if (q) {
       const hay = `${p.name} ${p.providerName} ${p.location ?? ''}`.toLowerCase()
       if (!hay.includes(q)) return false
