@@ -47,6 +47,7 @@ export default async function ProvidersPage() {
     planCount: planCounts.get(p.id) || 0,
     regions: [...new Set((p.datacenters || []).flatMap((dc) => (dc.region ? [dc.region] : [])))],
     startingMonthly: startingPrice.get(p.id) ?? null,
+    paymentMethods: p.paymentMethods || [],
   }))
 
   return (

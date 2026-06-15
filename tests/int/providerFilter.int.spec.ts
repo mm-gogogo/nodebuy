@@ -9,16 +9,17 @@ const mk = (over: Partial<ProviderItem>): ProviderItem => ({
   cnOptimized: false,
   planCount: 0,
   regions: [],
+  paymentMethods: [],
   ...over,
 })
 
 const items: ProviderItem[] = [
-  mk({ id: 1, name: 'BandwagonHost', tagline: 'CN2 GIA', headquarters: '加拿大', overallScore: 8.9, cnOptimized: true, planCount: 3, regions: ['na', 'apac'], startingMonthly: 16.99 }),
-  mk({ id: 2, name: 'Hetzner', tagline: '欧洲', headquarters: '德国', overallScore: 8.1, cnOptimized: false, planCount: 2, regions: ['eu'], startingMonthly: 4.5 }),
-  mk({ id: 3, name: 'CloudCone', tagline: '洛杉矶', headquarters: '美国', overallScore: 7.4, cnOptimized: false, planCount: 0, regions: ['na'], startingMonthly: null }),
+  mk({ id: 1, name: 'BandwagonHost', tagline: 'CN2 GIA', headquarters: '加拿大', overallScore: 8.9, cnOptimized: true, planCount: 3, regions: ['na', 'apac'], startingMonthly: 16.99, paymentMethods: ['alipay', 'paypal', 'crypto'] }),
+  mk({ id: 2, name: 'Hetzner', tagline: '欧洲', headquarters: '德国', overallScore: 8.1, cnOptimized: false, planCount: 2, regions: ['eu'], startingMonthly: 4.5, paymentMethods: ['card', 'paypal'] }),
+  mk({ id: 3, name: 'CloudCone', tagline: '洛杉矶', headquarters: '美国', overallScore: 7.4, cnOptimized: false, planCount: 0, regions: ['na'], startingMonthly: null, paymentMethods: ['alipay'] }),
 ]
 
-const base = { query: '', cnOnly: false, inStockOnly: false, region: 'all', sort: 'score' as const }
+const base = { query: '', cnOnly: false, inStockOnly: false, region: 'all', payment: 'all', sort: 'score' as const }
 
 describe('filterSortProviders · 过滤', () => {
   it('无筛选返回全部', () => {
@@ -40,6 +41,14 @@ describe('filterSortProviders · 过滤', () => {
   })
   it('地区 + 大陆优化 叠加', () => {
     expect(filterSortProviders(items, { ...base, region: 'na', cnOnly: true }).map((i) => i.id)).toEqual([1])
+  })
+  it('按付款方式筛选', () => {
+    expect(filterSortProviders(items, { ...base, payment: 'alipay' }).map((i) => i.id).sort()).toEqual([1, 3])
+    expect(filterSortProviders(items, { ...base, payment: 'crypto' }).map((i) => i.id)).toEqual([1])
+    expect(filterSortProviders(items, { ...base, payment: 'card' }).map((i) => i.id)).toEqual([2])
+  })
+  it('付款方式 + 地区 叠加', () => {
+    expect(filterSortProviders(items, { ...base, payment: 'alipay', region: 'apac' }).map((i) => i.id)).toEqual([1])
   })
 })
 
