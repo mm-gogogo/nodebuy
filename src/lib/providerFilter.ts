@@ -13,6 +13,7 @@ export interface ProviderItem {
   planCount: number
   regions: string[]
   startingMonthly?: number | null // 最低等效月价(起步价),无则 null
+  paymentMethods: string[]
 }
 
 export type ProviderSort = 'score' | 'name' | 'plans' | 'price'
@@ -22,6 +23,7 @@ export interface ProviderFilterState {
   cnOnly: boolean
   inStockOnly: boolean
   region: string // 'all' 或具体区域值
+  payment: string // 'all' 或具体付款方式
   sort: ProviderSort
 }
 
@@ -31,6 +33,7 @@ export function filterSortProviders(items: ProviderItem[], state: ProviderFilter
     if (state.cnOnly && !it.cnOptimized) return false
     if (state.inStockOnly && it.planCount <= 0) return false
     if (state.region !== 'all' && !it.regions.includes(state.region)) return false
+    if (state.payment !== 'all' && !it.paymentMethods.includes(state.payment)) return false
     if (q) {
       const hay = `${it.name} ${it.tagline ?? ''} ${it.headquarters ?? ''}`.toLowerCase()
       if (!hay.includes(q)) return false

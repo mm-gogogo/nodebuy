@@ -5,7 +5,7 @@ import Link from 'next/link'
 
 import { ProviderMark, ScoreChip } from '@/components/ui'
 import { filterSortProviders, type ProviderItem, type ProviderSort } from '@/lib/providerFilter'
-import { regionLabels } from '@/lib/labels'
+import { payLabels, regionLabels } from '@/lib/labels'
 
 const SORTS: { value: ProviderSort; label: string }[] = [
   { value: 'score', label: '综合评分 高→低' },
@@ -19,6 +19,7 @@ export function ProviderFilter({ items }: { items: ProviderItem[] }) {
   const [cnOnly, setCnOnly] = useState(false)
   const [inStockOnly, setInStockOnly] = useState(false)
   const [region, setRegion] = useState('all')
+  const [payment, setPayment] = useState('all')
   const [sort, setSort] = useState<ProviderSort>('score')
 
   // 只展示数据里出现过的区域
@@ -28,9 +29,16 @@ export function ProviderFilter({ items }: { items: ProviderItem[] }) {
     return [...set]
   }, [items])
 
+  // 只展示数据里出现过的付款方式
+  const payments = useMemo(() => {
+    const set = new Set<string>()
+    for (const it of items) for (const m of it.paymentMethods) set.add(m)
+    return [...set]
+  }, [items])
+
   const filtered = useMemo(
-    () => filterSortProviders(items, { query, cnOnly, inStockOnly, region, sort }),
-    [items, query, cnOnly, inStockOnly, region, sort],
+    () => filterSortProviders(items, { query, cnOnly, inStockOnly, region, payment, sort }),
+    [items, query, cnOnly, inStockOnly, region, payment, sort],
   )
 
   return (
@@ -44,6 +52,19 @@ export function ProviderFilter({ items }: { items: ProviderItem[] }) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
+        {payments.length ? (
+          <label className="filter-sort">
+            <span className="vh">付款方式</span>
+            <select value={payment} onChange={(e) => setPayment(e.target.value)} aria-label="按付款方式筛选">
+              <option value="all">不限付款</option>
+              {payments.map((m) => (
+                <option key={m} value={m}>
+                  {payLabels[m] || m}
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : null}
         <label className="filter-sort">
           <span className="vh">排序</span>
           <select value={sort} onChange={(e) => setSort(e.target.value as ProviderSort)} aria-label="排序方式">
