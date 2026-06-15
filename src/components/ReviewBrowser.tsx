@@ -1,14 +1,23 @@
 'use client'
 
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 
 import { filterReviews, reviewProviderOptions, type ReviewItem } from '@/lib/reviewFilter'
+import { buildReviewQuery, DEFAULT_REVIEW_STATE, type ReviewQueryState } from '@/lib/reviewQuery'
 import { fmtDate } from '@/lib/labels'
 
-export function ReviewBrowser({ items }: { items: ReviewItem[] }) {
-  const [query, setQuery] = useState('')
-  const [provider, setProvider] = useState('all')
+export function ReviewBrowser({ items, initial }: { items: ReviewItem[]; initial?: ReviewQueryState }) {
+  const init = initial ?? DEFAULT_REVIEW_STATE
+  const [query, setQuery] = useState(init.query)
+  const [provider, setProvider] = useState(init.provider)
+
+  // 同步筛选状态到 URL(history.replaceState,纯客户端、不触发重新请求)
+  useEffect(() => {
+    const qs = buildReviewQuery({ query, provider })
+    const url = qs ? `${window.location.pathname}?${qs}` : window.location.pathname
+    window.history.replaceState(null, '', url)
+  }, [query, provider])
 
   const providers = useMemo(() => reviewProviderOptions(items), [items])
   const shown = useMemo(() => filterReviews(items, { query, provider }), [items, query, provider])
