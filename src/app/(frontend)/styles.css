@@ -817,6 +817,88 @@ main {
   border: 0;
 }
 
+/* ———— plan compare ———— */
+.cmp-toggle {
+  font: inherit;
+  font-size: var(--text-xs);
+  padding: var(--space-2xs) var(--space-sm);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-ink-soft);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.cmp-toggle:hover:not(:disabled) {
+  border-color: var(--color-rule-strong);
+}
+.cmp-toggle.is-on {
+  background: var(--color-accent);
+  color: var(--color-on-ink);
+  border-color: var(--color-accent);
+}
+.cmp-toggle:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.compare-bar {
+  position: sticky;
+  bottom: var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+  padding: var(--space-sm) var(--space-lg);
+  background: color-mix(in oklch, var(--color-paper) 88%, transparent);
+  backdrop-filter: blur(14px) saturate(120%);
+  -webkit-backdrop-filter: blur(14px) saturate(120%);
+  border: var(--rule-hair) solid var(--color-rule-strong);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-pill);
+}
+.compare-bar .cmp-count {
+  font-size: var(--text-sm);
+  font-weight: 550;
+}
+.compare-bar .btn-ink {
+  margin-left: auto;
+}
+
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+.compare-table th,
+.compare-table td {
+  padding: var(--space-sm) var(--space-md);
+  text-align: left;
+  border-bottom: var(--rule-hair) solid var(--color-rule);
+  vertical-align: top;
+}
+.compare-table thead th {
+  border-bottom: var(--rule-hair) solid var(--color-rule-strong);
+}
+.compare-table tbody th[scope='row'] {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-neutral);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.compare-table td {
+  font-variant-numeric: tabular-nums;
+}
+.cmp-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+.cmp-head .cmp-name {
+  font-weight: 600;
+}
+
 /* ———— plan browser ———— */
 .route-tabs {
   display: flex;
