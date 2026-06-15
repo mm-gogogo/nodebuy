@@ -708,9 +708,51 @@ main {
 }
 
 /* ———— article / detail pages ———— */
+/* ———— breadcrumbs ———— */
+.breadcrumbs {
+  padding-top: var(--space-xl);
+}
+.breadcrumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2xs) var(--space-xs);
+  list-style: none;
+  font-size: var(--text-sm);
+  color: var(--color-neutral);
+}
+.breadcrumbs li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs) var(--space-xs);
+  min-width: 0;
+}
+.breadcrumbs li:not(:first-child)::before {
+  content: '/';
+  color: var(--color-rule-strong);
+}
+.breadcrumbs a {
+  color: var(--color-neutral);
+  transition: color var(--dur-short) var(--ease-out);
+}
+.breadcrumbs a:hover {
+  color: var(--color-ink);
+}
+.breadcrumbs [aria-current='page'] {
+  color: var(--color-ink-soft);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 22em;
+}
+
 .article-head {
   padding: var(--space-2xl) 0 var(--space-xl);
   border-bottom: var(--rule-hair) solid var(--color-rule);
+}
+/* 紧跟面包屑时收紧顶部留白,避免双重间距 */
+.breadcrumbs + .article-head {
+  padding-top: var(--space-md);
 }
 
 .article-head h1 {

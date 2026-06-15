@@ -23,5 +23,11 @@ for (const { name, path } of pages) {
     expect(items.map((i: { position: number }) => i.position)).toEqual(
       items.map((_: unknown, i: number) => i + 1),
     )
+
+    // 可见面包屑导航与 JSON-LD 对应
+    const nav = page.getByRole('navigation', { name: '面包屑' })
+    await expect(nav).toBeVisible()
+    await expect(nav.getByRole('link', { name: '首页' })).toHaveAttribute('href', '/')
+    await expect(nav.locator('[aria-current="page"]')).toBeVisible()
   })
 }
