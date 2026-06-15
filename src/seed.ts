@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-// 种子数据：pnpm payload run src/seed.ts
+// 种子数据：npx tsx src/seed.ts （payload run 无法解析 @payload-config 别名，会静默失败）
 // 数据为演示用途，价格与跑分为编辑整理的典型值。
 import 'dotenv/config'
 import { getPayload } from 'payload'

@@ -1,10 +1,9 @@
 import { defineConfig, devices } from '@playwright/test'
-
-/**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
- */
 import 'dotenv/config'
+
+// 端口可配置：默认 3000，本地若被占用可用 PORT=3100 pnpm test:e2e 覆盖。
+const PORT = process.env.PORT ? Number(process.env.PORT) : 3000
+const baseURL = process.env.BASE_URL || `http://localhost:${PORT}`
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -21,9 +20,7 @@ export default defineConfig({
   reporter: 'html',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
-    /* Base URL to use in actions like `await page.goto('/')`. */
-    // baseURL: 'http://localhost:3000',
-
+    baseURL,
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
   },
@@ -34,8 +31,10 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'pnpm dev',
-    reuseExistingServer: true,
-    url: 'http://localhost:3000',
+    command: `pnpm dev --port ${PORT}`,
+    // 本地复用已在跑的本项目 dev；CI 总是全新启动，避免误用占用端口的其它服务。
+    reuseExistingServer: !process.env.CI,
+    url: baseURL,
+    timeout: 120_000,
   },
 })
