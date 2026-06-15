@@ -62,6 +62,9 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
               <Link href="/deals">优惠</Link>
             </li>
           </ul>
+          <form className="nav-search" action="/search" role="search">
+            <input type="search" name="q" placeholder="搜索…" aria-label="站内搜索" />
+          </form>
         </nav>
         <main>{children}</main>
         <footer className="foot-line">
@@ -70,6 +73,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
               <span>© 2026 NodeBuy</span>
               <span>测评数据均为本站实测，跑分环境见各篇说明</span>
               <span className="aff-note">部分外链为推广链接（AFF），不影响测评结论</span>
+              <Link href="/search">搜索</Link>
               <Link href="/admin">管理后台</Link>
             </p>
           </div>
