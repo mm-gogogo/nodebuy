@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { filterSortPlans, effectiveMonthly, pricePerGbRam, type PlanItem } from '@/lib/planBrowse'
+import { filterSortPlans, effectiveMonthly, pricePerGbRam, pricePerGbStorage, type PlanItem } from '@/lib/planBrowse'
 
 const mk = (over: Partial<PlanItem>): PlanItem => ({
   id: 0,
@@ -96,5 +96,28 @@ describe('pricePerGbRam', () => {
   it('缺价或缺内存为 Infinity', () => {
     expect(pricePerGbRam(mk({ ramMB: 1024 }))).toBe(Infinity)
     expect(pricePerGbRam(mk({ priceMonthly: 5 }))).toBe(Infinity)
+  })
+})
+
+describe('pricePerGbStorage', () => {
+  it('等效月价 / GB 硬盘', () => {
+    expect(pricePerGbStorage(mk({ priceMonthly: 10, storageGB: 100 }))).toBe(0.1)
+    expect(pricePerGbStorage(mk({ priceYearly: 120, storageGB: 50 }))).toBe(0.2) // (120/12)/50
+  })
+  it('缺价或缺硬盘为 Infinity', () => {
+    expect(pricePerGbStorage(mk({ storageGB: 100 }))).toBe(Infinity)
+    expect(pricePerGbStorage(mk({ priceMonthly: 5 }))).toBe(Infinity)
+  })
+})
+
+describe('value-storage 排序', () => {
+  const storagePlans: PlanItem[] = [
+    mk({ id: 10, priceMonthly: 10, storageGB: 100 }), // 0.1/G
+    mk({ id: 11, priceMonthly: 5, storageGB: 20 }), // 0.25/G
+    mk({ id: 12, priceMonthly: 8, storageGB: 1000 }), // 0.008/G,最划算
+    mk({ id: 13, priceMonthly: 3 }), // 无硬盘 → Inf
+  ]
+  it('每 G 硬盘最划算升序,缺硬盘排末尾', () => {
+    expect(filterSortPlans(storagePlans, { ...base, sort: 'value-storage' }).map((p) => p.id)).toEqual([12, 10, 11, 13])
   })
 })
