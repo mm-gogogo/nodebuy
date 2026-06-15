@@ -14,6 +14,14 @@ const SORTS: { value: PlanSort; label: string }[] = [
   { value: 'ram-desc', label: '内存 大→小' },
 ]
 
+const RAM_STEPS: { mb: number; label: string }[] = [
+  { mb: 0, label: '内存不限' },
+  { mb: 1024, label: '1G+' },
+  { mb: 2048, label: '2G+' },
+  { mb: 4096, label: '4G+' },
+  { mb: 8192, label: '8G+' },
+]
+
 export function PlanBrowser({ items, initialRoute }: { items: PlanItem[]; initialRoute?: string }) {
   const [query, setQuery] = useState('')
   // 仅当 initialRoute 是数据里实际存在的线路时采用,否则回落到「全部」
@@ -22,6 +30,8 @@ export function PlanBrowser({ items, initialRoute }: { items: PlanItem[]; initia
   )
   const [sort, setSort] = useState<PlanSort>('price-asc')
   const [inStockOnly, setInStockOnly] = useState(false)
+  const [maxPrice, setMaxPrice] = useState('')
+  const [minRamMB, setMinRamMB] = useState(0)
   const [selected, setSelected] = useState<number[]>([])
 
   const atMax = selected.length >= MAX_COMPARE
@@ -36,9 +46,18 @@ export function PlanBrowser({ items, initialRoute }: { items: PlanItem[]; initia
     return [...set]
   }, [items])
 
+  const maxMonthly = maxPrice.trim() === '' ? null : Number(maxPrice)
   const shown = useMemo(
-    () => filterSortPlans(items, { query, route, sort, inStockOnly }),
-    [items, query, route, sort, inStockOnly],
+    () =>
+      filterSortPlans(items, {
+        query,
+        route,
+        sort,
+        inStockOnly,
+        maxMonthly: maxMonthly != null && Number.isFinite(maxMonthly) ? maxMonthly : null,
+        minRamMB,
+      }),
+    [items, query, route, sort, inStockOnly, maxMonthly, minRamMB],
   )
 
   return (
@@ -95,6 +114,35 @@ export function PlanBrowser({ items, initialRoute }: { items: PlanItem[]; initia
             {routeLabels[r] || r}
           </button>
         ))}
+      </div>
+
+      <div className="refine-bar">
+        <label className="refine-price">
+          月价上限
+          <input
+            type="number"
+            min="0"
+            inputMode="decimal"
+            placeholder="不限"
+            aria-label="月价上限(美元)"
+            value={maxPrice}
+            onChange={(e) => setMaxPrice(e.target.value)}
+          />
+          <span className="refine-unit">美元/月</span>
+        </label>
+        <div className="ram-tabs" role="group" aria-label="按内存下限筛选">
+          {RAM_STEPS.map((r) => (
+            <button
+              key={r.mb}
+              type="button"
+              className={`filter-chip${minRamMB === r.mb ? ' is-on' : ''}`}
+              aria-pressed={minRamMB === r.mb}
+              onClick={() => setMinRamMB(r.mb)}
+            >
+              {r.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       <ul className="plan-browse">
