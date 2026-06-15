@@ -63,3 +63,24 @@
   --z-nav: 20;
   --z-overlay: 30;
 }
+
+/* —— 深色主题:系统化反转明度、保持色相;on-ink 翻为深色,使以 ink/accent 为底的
+   组件(按钮/徽标/chip)文字自动适配。对比度由 a11y 扫描把关。 —— */
+[data-theme='dark'] {
+  --color-paper: oklch(16% 0.006 255);
+  --color-paper-2: oklch(20% 0.007 255);
+  --color-paper-3: oklch(24% 0.008 255);
+  --color-rule: oklch(30% 0.008 255);
+  --color-rule-strong: oklch(42% 0.01 255);
+  --color-neutral: oklch(70% 0.02 255);
+  --color-muted: oklch(78% 0.02 255);
+  --color-ink: oklch(93% 0.01 255);
+  --color-ink-soft: oklch(82% 0.012 255);
+  --color-accent: oklch(74% 0.13 255);
+  --color-accent-strong: oklch(82% 0.12 255);
+  --color-focus: oklch(74% 0.15 255);
+  --color-good: oklch(72% 0.13 155);
+  --color-warn: oklch(78% 0.13 75);
+  --color-on-ink: oklch(16% 0.01 255);
+  --shadow-pill: 0 8px 24px -14px oklch(0% 0 0 / 0.55);
+}
