@@ -6,10 +6,11 @@ import { getPayload } from 'payload'
 import config from '@payload-config'
 import { RichText } from '@payloadcms/richtext-lexical/react'
 
-import { AffButton, Breadcrumbs, ScoreBars } from '@/components/ui'
+import { AffButton, Breadcrumbs, RailHead, ScoreBars } from '@/components/ui'
 import { JsonLd } from '@/components/JsonLd'
 import { breadcrumbList } from '@/lib/jsonld'
-import { fmtDate, ispLabels, specLine } from '@/lib/labels'
+import { findProviderRankings, type RankingLite } from '@/lib/providerRankings'
+import { categoryLabels, fmtDate, ispLabels, specLine } from '@/lib/labels'
 
 export const revalidate = 60
 
@@ -50,6 +51,28 @@ export default async function ReviewDetail({ params }: { params: Promise<{ slug:
   const provider = typeof review.provider === 'object' ? review.provider : null
   const plan = typeof review.plan === 'object' ? review.plan : null
   const bench = review.benchmarks
+
+  // 相关内容:同服务商的其他测评 + 该服务商的上榜榜单(强化站内互链)
+  const payload = await getPayload({ config })
+  const [siblingsRes, rankingsRes] = provider
+    ? await Promise.all([
+        payload.find({
+          collection: 'reviews',
+          where: {
+            and: [
+              { provider: { equals: provider.id } },
+              { _status: { equals: 'published' } },
+              { id: { not_equals: review.id } },
+            ],
+          },
+          limit: 5,
+          sort: '-publishedAt',
+        }),
+        payload.find({ collection: 'rankings', limit: 50, depth: 0 }),
+      ])
+    : [null, null]
+  const siblings = siblingsRes?.docs ?? []
+  const appearances = provider && rankingsRes ? findProviderRankings(rankingsRes.docs as RankingLite[], provider.id) : []
 
   const scoreValues = [
     review.scores?.performance,
@@ -235,6 +258,36 @@ export default async function ReviewDetail({ params }: { params: Promise<{ slug:
           </p>
         ) : null}
       </article>
+
+      {provider && appearances.length ? (
+        <section className="rail--tight">
+          <p className="ranking-appearances">
+            <span className="rail__note" style={{ marginRight: 'var(--space-sm)' }}>
+              {provider.name} 上榜
+            </span>
+            {appearances.map((a) => (
+              <Link key={a.slug} href={`/rankings/${a.slug}`} className="ranking-appearance">
+                <span className="rank-pos">#{a.position}</span>
+                <span>{categoryLabels[a.category] || a.title}</span>
+              </Link>
+            ))}
+          </p>
+        </section>
+      ) : null}
+
+      {siblings.length ? (
+        <section className="rail">
+          <RailHead title={`${provider?.name ?? ''} 的其他测评`} moreHref={provider ? `/providers/${provider.slug}` : undefined} />
+          <div role="list">
+            {siblings.map((r) => (
+              <Link role="listitem" className="review-row" key={r.id} href={`/reviews/${r.slug}`}>
+                <span className="t">{r.title}</span>
+                <span className="meta">{fmtDate(r.publishedAt)}</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      ) : null}
     </div>
   )
 }
