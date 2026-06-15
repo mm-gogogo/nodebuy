@@ -10,11 +10,9 @@ import { FavoriteButton } from '@/components/FavoriteButton'
 import { JsonLd } from '@/components/JsonLd'
 import { breadcrumbList } from '@/lib/jsonld'
 import { findProviderRankings, type RankingLite } from '@/lib/providerRankings'
-import { categoryLabels, fmtDate, priceLine, routeLabels, specLine } from '@/lib/labels'
+import { categoryLabels, fmtDate, priceLine, regionLabels, routeLabels, specLine } from '@/lib/labels'
 
 export const revalidate = 60
-
-const regionLabels: Record<string, string> = { na: '北美', eu: '欧洲', apac: '亚太', cn: '中国大陆' }
 
 const getProvider = cache(async (slug: string) => {
   const payload = await getPayload({ config })

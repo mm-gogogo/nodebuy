@@ -21,7 +21,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     payload.find({ collection: 'rankings', limit: 1000, depth: 0, select: { slug: true, updatedAt: true } }),
   ])
 
-  const statics: MetadataRoute.Sitemap = ['', '/rankings', '/reviews', '/plans', '/lines', '/providers', '/deals'].map((path) => ({
+  const statics: MetadataRoute.Sitemap = ['', '/rankings', '/reviews', '/plans', '/lines', '/regions', '/providers', '/deals'].map((path) => ({
     url: `${siteUrl}${path}`,
     changeFrequency: 'daily',
     priority: path === '' ? 1 : 0.8,

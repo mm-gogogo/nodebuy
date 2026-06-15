@@ -37,7 +37,10 @@ export default async function LinesPage() {
     <div className="wrap">
       <header className="masthead">
         <h1>线路总览</h1>
-        <p className="lede">按回程线路汇总在售套餐:哪条线路选择多、谁家在做、最低多少钱,点进去看全部套餐。</p>
+        <p className="lede">
+          按回程线路汇总在售套餐:哪条线路选择多、谁家在做、最低多少钱,点进去看全部套餐。也可以
+          <Link href="/regions"> 按机房地区 </Link>看。
+        </p>
       </header>
       <section className="rail--tight">
         {groups.length === 0 ? (
