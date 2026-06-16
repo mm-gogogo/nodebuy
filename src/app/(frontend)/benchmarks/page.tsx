@@ -40,7 +40,7 @@ export default async function BenchmarksPage() {
         <h1>跑分排行</h1>
         <p className="lede">
           把各篇实测的 Geekbench 5 与磁盘读写放到一起排:按任一指标排序,横向看哪台机器更快。也看
-          <Link href="/network"> 三网测速排行 </Link>。
+          <Link href="/network"> 三网测速排行 </Link>与<Link href="/value"> 性价比排行 </Link>。
         </p>
       </header>
       <section className="rail--tight">

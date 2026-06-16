@@ -1,4 +1,5 @@
 import React from 'react'
+import Link from 'next/link'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 
@@ -47,7 +48,10 @@ export default async function PlansPage({
     <div className="wrap">
       <header className="masthead">
         <h1>套餐总览</h1>
-        <p className="lede">把各家在售套餐放到一起比：按线路筛、按价格或内存排，看准规格再点进服务商下单。</p>
+        <p className="lede">
+          把各家在售套餐放到一起比：按线路筛、按价格或内存排，看准规格再点进服务商下单。想直接看谁最划算,去
+          <Link href="/value"> 性价比排行 </Link>。
+        </p>
       </header>
       <section className="rail--tight">
         {items.length === 0 ? (

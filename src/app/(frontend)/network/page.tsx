@@ -40,7 +40,7 @@ export default async function NetworkPage() {
         <h1>三网测速排行</h1>
         <p className="lede">
           把各篇实测的三网下载、上传与延迟放到一起排:按下载或延迟排序,横向看哪台机器到大陆更快。也看
-          <Link href="/benchmarks"> 跑分排行 </Link>。
+          <Link href="/benchmarks"> 跑分排行 </Link>与<Link href="/value"> 性价比排行 </Link>。
         </p>
       </header>
       <section className="rail--tight">
