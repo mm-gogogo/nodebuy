@@ -1419,6 +1419,9 @@ main {
   font-family: var(--font-body);
   font-size: var(--text-xs);
   color: var(--color-neutral);
+  /* 副标题可换行:性价比榜的副行较长(服务商·机房·线路·月价),
+     不换行会撑宽首列,把窄屏唯一保留的指标列挤出视口。短副标题(跑分/测速)不受影响。 */
+  white-space: normal;
 }
 .bench-rank .bench-cpu {
   font-size: var(--text-xs);

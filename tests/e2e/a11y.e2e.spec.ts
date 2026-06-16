@@ -11,6 +11,7 @@ const pages: Array<{ name: string; path: string }> = [
   { name: '测评详情', path: '/reviews/bandwagonhost-cn2-gia-e-dc6-review' },
   { name: '跑分排行', path: '/benchmarks' },
   { name: '三网测速排行', path: '/network' },
+  { name: '性价比排行', path: '/value' },
   { name: '套餐总览', path: '/plans' },
   { name: '线路总览', path: '/lines' },
   { name: '机房地区', path: '/regions' },
