@@ -25,7 +25,8 @@ test.describe('套餐总览', () => {
     const rows = page.locator('.plan-browse > li')
     const total = await rows.count()
 
-    const cn2 = page.getByRole('button', { name: 'CN2 GIA' })
+    // 限定在线路筛选组内,避免与套餐行的收藏按钮(aria-label 含套餐名)同名冲突
+    const cn2 = page.getByRole('group', { name: '按线路筛选' }).getByRole('button', { name: 'CN2 GIA' })
     await cn2.click()
     await expect(cn2).toHaveAttribute('aria-pressed', 'true')
     const filtered = await rows.count()

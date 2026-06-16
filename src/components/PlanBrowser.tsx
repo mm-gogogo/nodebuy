@@ -4,10 +4,12 @@ import React, { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 
 import { AffButton, ProviderMark } from '@/components/ui'
+import { FavoriteButton } from '@/components/FavoriteButton'
 import { priceLine, routeLabels, specLine } from '@/lib/labels'
 import { filterSortPlans, pricePerGbRam, pricePerGbStorage, type PlanItem, type PlanSort } from '@/lib/planBrowse'
 import { pricePerTbTraffic } from '@/lib/value'
 import { MAX_COMPARE } from '@/lib/compare'
+import { PLAN_FAVORITES_KEY } from '@/lib/favorites'
 import { buildPlanQuery, DEFAULT_PLAN_STATE, type PlanQueryState } from '@/lib/planQuery'
 
 const SORTS: { value: PlanSort; label: string }[] = [
@@ -217,6 +219,7 @@ export function PlanBrowser({ items, initial }: { items: PlanItem[]; initial?: P
                   ) : null
                 })()}
               </span>
+              <FavoriteButton slug={String(p.id)} name={p.name} storeKey={PLAN_FAVORITES_KEY} compact />
               {(() => {
                 const on = selected.includes(p.id)
                 return (
