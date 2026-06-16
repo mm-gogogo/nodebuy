@@ -1,5 +1,12 @@
 import { describe, it, expect } from 'vitest'
-import { parsePlanIds, comparePlanRows, MAX_COMPARE, type ComparePlan } from '@/lib/compare'
+import {
+  parsePlanIds,
+  comparePlanRows,
+  bestCols,
+  compareMonthly,
+  MAX_COMPARE,
+  type ComparePlan,
+} from '@/lib/compare'
 
 describe('parsePlanIds', () => {
   it('解析逗号分隔的 id', () => {
@@ -49,14 +56,65 @@ describe('comparePlanRows', () => {
     expect(get('流量')).toEqual(['1T/月', '不限'])
     expect(get('线路')).toEqual(['CN2 GIA', '—'])
     expect(get('机房')).toEqual(['洛杉矶', '—'])
+    expect(get('等效月价')).toEqual(['$16.99/月', '$4.50/月'])
     expect(get('月付')).toEqual(['$16.99', '$4.5'])
     expect(get('年付')).toEqual(['$169.99', '—'])
     expect(get('库存')).toEqual(['有货', '缺货'])
+  })
+
+  it('标记每项最优列(A=0,B=1)', () => {
+    const rows = comparePlanRows(plans)
+    const best = (label: string) => rows.find((r) => r.label === label)?.best
+    expect(best('vCPU')).toEqual([0]) // 2 核 > 1 核
+    expect(best('内存')).toEqual([1]) // 4G > 2G
+    expect(best('硬盘')).toEqual([1]) // 80G > 40G
+    expect(best('流量')).toEqual([1]) // 不限 > 1T
+    expect(best('等效月价')).toEqual([1]) // $4.50 < $16.99
+    // 非量化行不打标
+    expect(best('服务商')).toBeUndefined()
+    expect(best('机房')).toBeUndefined()
+  })
+
+  it('单个套餐时不打最优标(无可比对象)', () => {
+    const rows = comparePlanRows([plans[0]])
+    for (const r of rows) expect(r.best ?? []).toEqual([])
   })
 
   it('每行 values 数量与套餐数一致', () => {
     for (const row of comparePlanRows(plans)) {
       expect(row.values).toHaveLength(plans.length)
     }
+  })
+})
+
+describe('bestCols', () => {
+  it('higherBetter 取最大列', () => {
+    expect(bestCols([2, 1], true)).toEqual([0])
+    expect(bestCols([1, 2, 2], true)).toEqual([1, 2]) // 并列最优都标
+  })
+  it('lowerBetter 取最小列', () => {
+    expect(bestCols([10, 4, 4], false)).toEqual([1, 2])
+  })
+  it('全员相等 → 不标(无信号)', () => {
+    expect(bestCols([5, 5], true)).toEqual([])
+  })
+  it('可比项不足两个 → 不标', () => {
+    expect(bestCols([3, null], true)).toEqual([])
+    expect(bestCols([null, null], true)).toEqual([])
+    expect(bestCols([], true)).toEqual([])
+  })
+  it('忽略缺失项,在其余里取最优', () => {
+    expect(bestCols([null, 7, 3], true)).toEqual([1])
+  })
+})
+
+describe('compareMonthly', () => {
+  const mk = (over: Partial<ComparePlan>): ComparePlan => ({
+    id: 0, name: 'p', providerName: 'P', providerSlug: 'p', inStock: true, ...over,
+  })
+  it('优先月付,否则年付/12,都无则 null', () => {
+    expect(compareMonthly(mk({ priceMonthly: 5, priceYearly: 50 }))).toBe(5)
+    expect(compareMonthly(mk({ priceYearly: 120 }))).toBe(10)
+    expect(compareMonthly(mk({}))).toBeNull()
   })
 })
