@@ -1430,6 +1430,13 @@ main {
   color: var(--color-ink);
   font-weight: 700;
 }
+/* 窄屏:排行只留 # / 测评 / 当前排序指标列,避免横向滚动看不全 */
+@media (max-width: 640px) {
+  .bench-rank thead th:nth-child(n + 3):not(.is-sorted),
+  .bench-rank tbody td:nth-child(n + 3):not(.is-sorted) {
+    display: none;
+  }
+}
 
 /* ———— breadcrumbs ———— */
 .breadcrumbs {

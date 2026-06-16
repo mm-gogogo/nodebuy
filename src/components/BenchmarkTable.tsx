@@ -43,10 +43,10 @@ export function BenchmarkTable({ rows }: { rows: BenchRow[] }) {
               <th scope="col">#</th>
               <th scope="col">测评 / 服务商</th>
               <th scope="col">CPU</th>
-              <th scope="col">GB5 单核</th>
-              <th scope="col">GB5 多核</th>
-              <th scope="col">磁盘读</th>
-              <th scope="col">磁盘写</th>
+              <th scope="col" className={sort === 'gb5Single' ? 'is-sorted' : undefined}>GB5 单核</th>
+              <th scope="col" className={sort === 'gb5Multi' ? 'is-sorted' : undefined}>GB5 多核</th>
+              <th scope="col" className={sort === 'diskRead' ? 'is-sorted' : undefined}>磁盘读</th>
+              <th scope="col" className={sort === 'diskWrite' ? 'is-sorted' : undefined}>磁盘写</th>
             </tr>
           </thead>
           <tbody>

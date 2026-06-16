@@ -40,9 +40,9 @@ export function NetworkTable({ rows }: { rows: NetRow[] }) {
             <tr>
               <th scope="col">#</th>
               <th scope="col">测评 / 服务商</th>
-              <th scope="col">最佳下载</th>
+              <th scope="col" className={sort === 'download' ? 'is-sorted' : undefined}>最佳下载</th>
               <th scope="col">最佳上传</th>
-              <th scope="col">最低延迟</th>
+              <th scope="col" className={sort === 'latency' ? 'is-sorted' : undefined}>最低延迟</th>
               <th scope="col">测速节点</th>
             </tr>
           </thead>
