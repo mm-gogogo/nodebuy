@@ -30,4 +30,16 @@ test.describe('服务商对比', () => {
     await page.goto('/compare-providers')
     await expect(page.getByText(/还没有要对比的服务商/)).toBeVisible()
   })
+
+  test('每项最优单元格高亮且带可访问标记', async ({ page }) => {
+    await page.goto('/compare-providers?slugs=bandwagonhost,dmit')
+    await expect(page.locator('table.compare-table')).toBeVisible()
+    // 两家评分各异,各维度互有胜负 → 至少两个最优单元格
+    const bestCells = page.locator('.compare-table td.is-best')
+    expect(await bestCells.count()).toBeGreaterThanOrEqual(2)
+    // 最优用绿色 ✓ + aria-label,不靠颜色单独传达
+    const mark = page.locator('.compare-table td.is-best .cmp-best').first()
+    await expect(mark).toHaveAttribute('aria-label', '本项最优')
+    await expect(mark).toContainText('✓')
+  })
 })

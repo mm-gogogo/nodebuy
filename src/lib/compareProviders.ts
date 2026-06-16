@@ -1,5 +1,6 @@
 import { isValidSlug } from './slug'
 import { payLabels } from './labels'
+import { bestCols } from './compare'
 
 export const MAX_COMPARE_PROVIDERS = 4
 
@@ -40,25 +41,28 @@ export interface CompareProvider {
 export interface CompareRow {
   label: string
   values: string[]
+  best?: number[] // 该行「最优」列下标(可并列);仅量化行有,且需存在可比差异
 }
 
 const score = (n?: number | null) => (n != null ? n.toFixed(1) : '—')
 
 export function compareProviderRows(providers: CompareProvider[]): CompareRow[] {
   const col = <T,>(fn: (p: CompareProvider) => T) => providers.map(fn)
+  // 评分类与机房数:数值越高越优,标出每行最优列(复用 compare.bestCols)
+  const num = (fn: (p: CompareProvider) => number | null | undefined) => bestCols(col((p) => fn(p) ?? null), true)
   return [
-    { label: '综合评分', values: col((p) => score(p.overallScore)) },
-    { label: '性能', values: col((p) => score(p.scores?.performance)) },
-    { label: '网络', values: col((p) => score(p.scores?.network)) },
-    { label: '性价比', values: col((p) => score(p.scores?.value)) },
-    { label: '售后', values: col((p) => score(p.scores?.support)) },
+    { label: '综合评分', values: col((p) => score(p.overallScore)), best: num((p) => p.overallScore) },
+    { label: '性能', values: col((p) => score(p.scores?.performance)), best: num((p) => p.scores?.performance) },
+    { label: '网络', values: col((p) => score(p.scores?.network)), best: num((p) => p.scores?.network) },
+    { label: '性价比', values: col((p) => score(p.scores?.value)), best: num((p) => p.scores?.value) },
+    { label: '售后', values: col((p) => score(p.scores?.support)), best: num((p) => p.scores?.support) },
     { label: '成立', values: col((p) => (p.founded != null ? String(p.founded) : '—')) },
     { label: '总部', values: col((p) => p.headquarters || '—') },
     {
       label: '付款',
       values: col((p) => (p.paymentMethods?.length ? p.paymentMethods.map((m) => payLabels[m] || m).join(' · ') : '—')),
     },
-    { label: '机房数', values: col((p) => String(p.datacenterCount)) },
+    { label: '机房数', values: col((p) => String(p.datacenterCount)), best: num((p) => p.datacenterCount) },
     { label: '大陆优化', values: col((p) => (p.cnOptimized ? '✓' : '—')) },
   ]
 }
