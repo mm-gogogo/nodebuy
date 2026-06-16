@@ -35,6 +35,7 @@ export default async function ReviewsPage({
       providerSlug: provider?.slug || '',
       publishedAt: r.publishedAt,
       metrics: reviewRowMetrics(r),
+      scores: r.scores ?? null,
     }
   })
 

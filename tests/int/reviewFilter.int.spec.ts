@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { filterReviews, reviewProviderOptions, type ReviewItem } from '@/lib/reviewFilter'
+import { filterReviews, overallScore, reviewProviderOptions, type ReviewItem } from '@/lib/reviewFilter'
 
 const mk = (over: Partial<ReviewItem>): ReviewItem => ({
   id: 0,
@@ -37,6 +37,52 @@ describe('filterReviews', () => {
   })
   it('无匹配返回空', () => {
     expect(filterReviews(items, { ...base, query: '不存在' })).toEqual([])
+  })
+})
+
+describe('overallScore', () => {
+  it('四项均值', () => {
+    expect(overallScore({ performance: 8, network: 6, value: 7, support: 9 })).toBe(7.5)
+  })
+  it('只计有值项', () => {
+    expect(overallScore({ performance: 8, network: null, value: 6, support: undefined })).toBe(7)
+  })
+  it('全缺/空为 null', () => {
+    expect(overallScore({})).toBeNull()
+    expect(overallScore(null)).toBeNull()
+  })
+})
+
+describe('filterReviews 排序', () => {
+  // A=1(Mar) B=2(Jan) C=3(Feb) D=4(无日期无分)
+  const sortable: ReviewItem[] = [
+    mk({ id: 1, publishedAt: '2026-03-01', scores: { performance: 9, network: 5, value: 6, support: 8 } }), // 综合7.0
+    mk({ id: 2, publishedAt: '2026-01-01', scores: { performance: 6, network: 9, value: 5, support: 6 } }), // 综合6.5
+    mk({ id: 3, publishedAt: '2026-02-01', scores: { performance: 7, network: 7, value: 9, support: 5 } }), // 综合7.0
+    mk({ id: 4 }), // 无日期无分
+  ]
+  const run = (sort: 'newest' | 'overall' | 'performance' | 'network' | 'value') =>
+    filterReviews(sortable, { query: '', provider: 'all', sort }).map((r) => r.id)
+
+  it('默认/最新:发布日期降序,无日期垫底', () => {
+    expect(run('newest')).toEqual([1, 3, 2, 4])
+  })
+  it('综合评分降序,并列稳定(1 在 3 前),无分垫底', () => {
+    expect(run('overall')).toEqual([1, 3, 2, 4])
+  })
+  it('性能评分降序', () => {
+    expect(run('performance')).toEqual([1, 3, 2, 4])
+  })
+  it('网络评分降序(明显区别于按日期)', () => {
+    expect(run('network')).toEqual([2, 3, 1, 4])
+  })
+  it('性价比评分降序', () => {
+    expect(run('value')).toEqual([3, 1, 2, 4])
+  })
+  it('不修改入参', () => {
+    const before = sortable.map((r) => r.id)
+    run('network')
+    expect(sortable.map((r) => r.id)).toEqual(before)
   })
 })
 
