@@ -73,9 +73,20 @@ export default async function CompareProvidersPage({
               {rows.map((row) => (
                 <tr key={row.label}>
                   <th scope="row">{row.label}</th>
-                  {row.values.map((v, i) => (
-                    <td key={providers[i].slug}>{v}</td>
-                  ))}
+                  {row.values.map((v, i) => {
+                    const best = row.best?.includes(i)
+                    return (
+                      <td key={providers[i].slug} className={best ? 'is-best' : undefined}>
+                        {v}
+                        {best ? (
+                          <span className="cmp-best" aria-label="本项最优" title="本项最优">
+                            {' '}
+                            ✓
+                          </span>
+                        ) : null}
+                      </td>
+                    )
+                  })}
                 </tr>
               ))}
               <tr>

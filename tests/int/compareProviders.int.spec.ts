@@ -53,6 +53,22 @@ describe('compareProviderRows', () => {
     expect(get('大陆优化')).toEqual(['✓', '—'])
   })
 
+  it('标记每项最优列(bwh=0, hetzner=1)', () => {
+    const rows = compareProviderRows(ps)
+    const best = (l: string) => rows.find((r) => r.label === l)?.best
+    expect(best('综合评分')).toEqual([0]) // 8.9 > 8.1
+    expect(best('性能')).toEqual([1]) // 8.5 > 8.2
+    expect(best('网络')).toEqual([]) // hetzner 缺分,可比项不足两个 → 不标
+    expect(best('性价比')).toEqual([1]) // 9.2 > 7.6
+    expect(best('售后')).toEqual([0]) // 7.8 > 7
+    expect(best('机房数')).toEqual([0]) // 8 > 2
+    // 定性行不打标
+    expect(best('成立')).toBeUndefined()
+    expect(best('总部')).toBeUndefined()
+    expect(best('付款')).toBeUndefined()
+    expect(best('大陆优化')).toBeUndefined()
+  })
+
   it('每行 values 数量与服务商数一致', () => {
     for (const row of compareProviderRows(ps)) expect(row.values).toHaveLength(ps.length)
   })
