@@ -3,7 +3,7 @@ import Link from 'next/link'
 import './styles.css'
 
 import type { Metadata } from 'next'
-import { ThemeToggle } from '@/components/ThemeToggle'
+import { SiteNav } from '@/components/SiteNav'
 import { THEME_INIT_SCRIPT } from '@/lib/theme'
 
 const siteUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
@@ -48,36 +48,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
           <Link className="wordmark" href="/">
             NodeBuy
           </Link>
-          <ul className="nav-pill__links">
-            <li>
-              <Link href="/guide">选购</Link>
-            </li>
-            <li>
-              <Link href="/rankings">榜单</Link>
-            </li>
-            <li>
-              <Link href="/reviews">测评</Link>
-            </li>
-            <li>
-              <Link href="/benchmarks">跑分</Link>
-            </li>
-            <li>
-              <Link href="/plans">套餐</Link>
-            </li>
-            <li>
-              <Link href="/lines">线路</Link>
-            </li>
-            <li>
-              <Link href="/providers">服务商</Link>
-            </li>
-            <li>
-              <Link href="/deals">优惠</Link>
-            </li>
-          </ul>
-          <form className="nav-search" action="/search" role="search">
-            <input type="search" name="q" placeholder="搜索…" aria-label="站内搜索" />
-          </form>
-          <ThemeToggle />
+          <SiteNav />
         </nav>
         <main>{children}</main>
         <footer className="foot-line">
