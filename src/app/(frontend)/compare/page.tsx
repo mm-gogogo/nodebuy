@@ -76,9 +76,20 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
               {rows.map((row) => (
                 <tr key={row.label}>
                   <th scope="row">{row.label}</th>
-                  {row.values.map((v, i) => (
-                    <td key={plans[i].id}>{v}</td>
-                  ))}
+                  {row.values.map((v, i) => {
+                    const best = row.best?.includes(i)
+                    return (
+                      <td key={plans[i].id} className={best ? 'is-best' : undefined}>
+                        {v}
+                        {best ? (
+                          <span className="cmp-best" aria-label="本项最优" title="本项最优">
+                            {' '}
+                            ✓
+                          </span>
+                        ) : null}
+                      </td>
+                    )
+                  })}
                 </tr>
               ))}
               <tr>

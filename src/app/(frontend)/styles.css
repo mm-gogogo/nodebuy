@@ -1120,6 +1120,15 @@ main {
 .cmp-head .cmp-name {
   font-weight: 600;
 }
+/* 对比表:每项最优的单元格——加粗用 ink,配绿色 ✓ 提供非颜色线索(a11y) */
+.compare-table td.is-best {
+  color: var(--color-ink);
+  font-weight: 600;
+}
+.compare-table .cmp-best {
+  color: var(--color-good);
+  font-weight: 700;
+}
 
 /* ———— plan browser ———— */
 .route-tabs {
