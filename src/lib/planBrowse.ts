@@ -18,7 +18,7 @@ export interface PlanItem {
   inStock: boolean
 }
 
-export type PlanSort = 'price-asc' | 'price-desc' | 'ram-desc' | 'value-ram' | 'value-storage'
+export type PlanSort = 'price-asc' | 'price-desc' | 'ram-desc' | 'value-ram' | 'value-storage' | 'value-traffic'
 
 export interface PlanBrowseState {
   query: string
@@ -27,6 +27,7 @@ export interface PlanBrowseState {
   inStockOnly: boolean
   maxMonthly?: number | null // 等效月价上限($/月),null/未填=不限
   minRamMB?: number // 内存下限(MB),0/未填=不限
+  storageType?: string // 硬盘类型筛选('all'/未填=不限,否则 nvme/ssd/hdd)
 }
 
 // 归一为「等效月价」用于排序:优先月付,否则年付/12;都没有则视为无穷大(排末尾)。
@@ -64,6 +65,7 @@ export function filterSortPlans(items: PlanItem[], state: PlanBrowseState): Plan
     if (state.route !== 'all' && p.route !== state.route) return false
     if (state.maxMonthly != null && effectiveMonthly(p) > state.maxMonthly) return false
     if (state.minRamMB && (p.ramMB ?? 0) < state.minRamMB) return false
+    if (state.storageType && state.storageType !== 'all' && p.storageType !== state.storageType) return false
     if (q) {
       const hay = `${p.name} ${p.providerName} ${p.location ?? ''}`.toLowerCase()
       if (!hay.includes(q)) return false
@@ -86,6 +88,20 @@ export function filterSortPlans(items: PlanItem[], state: PlanBrowseState): Plan
       if (aInf) return 1
       if (bInf) return -1
       return va - vb
+    })
+  } else if (state.sort === 'value-traffic') {
+    // 每 TB 流量最划算:不限流量(trafficTB=0)最优置顶,其次 $/TB 升序,缺流量/缺价垫底。
+    // 用 < 比较以正确处理 ±Infinity(Infinity-Infinity=NaN 会破坏排序)。
+    const key = (p: PlanItem): number => {
+      if (p.trafficTB === 0) return -Infinity
+      const m = effectiveMonthly(p)
+      if (!Number.isFinite(m) || p.trafficTB == null || p.trafficTB < 0) return Infinity
+      return m / p.trafficTB
+    }
+    sorted.sort((a, b) => {
+      const ka = key(a)
+      const kb = key(b)
+      return ka === kb ? 0 : ka < kb ? -1 : 1
     })
   } else {
     const dir = state.sort === 'price-desc' ? -1 : 1
