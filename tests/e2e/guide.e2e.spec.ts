@@ -30,4 +30,30 @@ test.describe('选购助手', () => {
     const badges = page.locator('.plan-browse .badge--accent')
     expect(await badges.count()).toBeGreaterThan(0)
   })
+
+  test('切换用途改变排序口径与单价单位', async ({ page }) => {
+    await page.goto('/guide')
+    await page.getByRole('group', { name: '月预算' }).getByRole('button', { name: '不限' }).click()
+    const firstUnit = page.locator('.plan-browse .pb-unit').first()
+    const useCase = page.getByRole('group', { name: '用途' })
+
+    // 默认通用/建站 → 每 G 内存
+    await useCase.getByRole('button', { name: '通用 / 建站' }).click()
+    await expect(firstUnit).toContainText('/G内存')
+
+    // 存储/备份 → 每 G 硬盘
+    await useCase.getByRole('button', { name: '存储 / 备份' }).click()
+    await expect(firstUnit).toContainText('/G硬盘')
+
+    // 中转/流量 → 每 TB 流量(或不限流量)
+    await useCase.getByRole('button', { name: '中转 / 流量' }).click()
+    await expect(firstUnit).toContainText(/\/TB流量|不限流量/)
+
+    // 算力/CPU → 每核
+    await useCase.getByRole('button', { name: '算力 / CPU' }).click()
+    await expect(firstUnit).toContainText('/核')
+
+    // 标题反映当前用途
+    await expect(page.getByText(/按「算力 \/ CPU」为你挑了/)).toBeVisible()
+  })
 })
