@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { validateSlug } from '../lib/slug'
+import { autoSlug, validateSlug } from '../lib/slug'
 
 export const Rankings: CollectionConfig = {
   slug: 'rankings',
@@ -12,7 +12,17 @@ export const Rankings: CollectionConfig = {
   access: { read: () => true },
   fields: [
     { name: 'title', label: '榜单标题', type: 'text', required: true },
-    { name: 'slug', label: 'Slug', type: 'text', required: true, unique: true, index: true, validate: validateSlug },
+    {
+      name: 'slug',
+      label: 'Slug',
+      type: 'text',
+      required: true,
+      unique: true,
+      index: true,
+      validate: validateSlug,
+      hooks: { beforeValidate: [({ value, data }) => autoSlug(value, data?.title)] },
+      admin: { description: '留空将根据标题自动生成；纯中文标题需手填' },
+    },
     {
       name: 'category',
       label: '分类',

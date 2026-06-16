@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { validateSlug } from '../lib/slug'
+import { autoSlug, validateSlug } from '../lib/slug'
 
 export const Reviews: CollectionConfig = {
   slug: 'reviews',
@@ -13,7 +13,17 @@ export const Reviews: CollectionConfig = {
   versions: { drafts: true },
   fields: [
     { name: 'title', label: '标题', type: 'text', required: true },
-    { name: 'slug', label: 'Slug', type: 'text', required: true, unique: true, index: true, validate: validateSlug },
+    {
+      name: 'slug',
+      label: 'Slug',
+      type: 'text',
+      required: true,
+      unique: true,
+      index: true,
+      validate: validateSlug,
+      hooks: { beforeValidate: [({ value, data }) => autoSlug(value, data?.title)] },
+      admin: { description: '留空将根据标题自动生成；纯中文标题需手填' },
+    },
     { name: 'provider', label: '服务商', type: 'relationship', relationTo: 'providers', required: true },
     { name: 'plan', label: '关联套餐', type: 'relationship', relationTo: 'plans' },
     { name: 'excerpt', label: '摘要', type: 'textarea' },

@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { validateSlug } from '../lib/slug'
+import { autoSlug, validateSlug } from '../lib/slug'
 import { validateHexColor } from '../lib/color'
 
 export const Providers: CollectionConfig = {
@@ -13,7 +13,17 @@ export const Providers: CollectionConfig = {
   access: { read: () => true },
   fields: [
     { name: 'name', label: '名称', type: 'text', required: true },
-    { name: 'slug', label: 'Slug', type: 'text', required: true, unique: true, index: true, validate: validateSlug },
+    {
+      name: 'slug',
+      label: 'Slug',
+      type: 'text',
+      required: true,
+      unique: true,
+      index: true,
+      validate: validateSlug,
+      hooks: { beforeValidate: [({ value, data }) => autoSlug(value, data?.name)] },
+      admin: { description: '留空将根据名称自动生成；纯中文名称需手填' },
+    },
     { name: 'tagline', label: '一句话定位', type: 'text' },
     { name: 'description', label: '简介', type: 'textarea' },
     { name: 'website', label: '官网', type: 'text' },

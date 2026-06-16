@@ -178,6 +178,9 @@ export interface Media {
 export interface Provider {
   id: number;
   name: string;
+  /**
+   * 留空将根据名称自动生成；纯中文名称需手填
+   */
   slug: string;
   tagline?: string | null;
   description?: string | null;
@@ -258,6 +261,9 @@ export interface Plan {
 export interface Review {
   id: number;
   title: string;
+  /**
+   * 留空将根据标题自动生成；纯中文标题需手填
+   */
   slug: string;
   provider: number | Provider;
   plan?: (number | null) | Plan;
@@ -321,6 +327,9 @@ export interface Review {
 export interface Ranking {
   id: number;
   title: string;
+  /**
+   * 留空将根据标题自动生成；纯中文标题需手填
+   */
   slug: string;
   category: 'overall' | 'value' | 'cn-optimized' | 'performance' | 'storage' | 'budget';
   description?: string | null;
