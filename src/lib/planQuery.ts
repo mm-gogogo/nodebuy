@@ -10,10 +10,12 @@ export interface PlanQueryState {
   maxPrice: string // 保留字符串,空串=不限
   minRamMB: number
   inStockOnly: boolean
+  storageType: string // 'all' 或 nvme/ssd/hdd
 }
 
-const VALID_SORTS: PlanSort[] = ['price-asc', 'price-desc', 'ram-desc', 'value-ram', 'value-storage']
+const VALID_SORTS: PlanSort[] = ['price-asc', 'price-desc', 'ram-desc', 'value-ram', 'value-storage', 'value-traffic']
 const VALID_RAM = [0, 1024, 2048, 4096, 8192]
+const VALID_STORAGE = ['nvme', 'ssd', 'hdd']
 
 export const DEFAULT_PLAN_STATE: PlanQueryState = {
   query: '',
@@ -22,6 +24,7 @@ export const DEFAULT_PLAN_STATE: PlanQueryState = {
   maxPrice: '',
   minRamMB: 0,
   inStockOnly: false,
+  storageType: 'all',
 }
 
 // 只写入非默认值,URL 尽量干净。
@@ -33,6 +36,7 @@ export function buildPlanQuery(s: PlanQueryState): string {
   if (s.maxPrice.trim()) p.set('max', s.maxPrice.trim())
   if (s.minRamMB) p.set('ram', String(s.minRamMB))
   if (s.inStockOnly) p.set('stock', '1')
+  if (s.storageType && s.storageType !== 'all') p.set('disk', s.storageType)
   return p.toString()
 }
 
@@ -45,6 +49,7 @@ function first(v: string | string[] | undefined): string | undefined {
 export function readPlanQuery(params: RawParams): PlanQueryState {
   const sortRaw = first(params.sort) as PlanSort | undefined
   const ram = Number(first(params.ram))
+  const disk = first(params.disk)
   return {
     query: first(params.q) ?? '',
     route: first(params.route) ?? 'all',
@@ -52,5 +57,6 @@ export function readPlanQuery(params: RawParams): PlanQueryState {
     maxPrice: first(params.max) ?? '',
     minRamMB: VALID_RAM.includes(ram) ? ram : 0,
     inStockOnly: first(params.stock) === '1',
+    storageType: disk && VALID_STORAGE.includes(disk) ? disk : 'all',
   }
 }

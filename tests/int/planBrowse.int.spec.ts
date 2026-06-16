@@ -121,3 +121,33 @@ describe('value-storage 排序', () => {
     expect(filterSortPlans(storagePlans, { ...base, sort: 'value-storage' }).map((p) => p.id)).toEqual([12, 10, 11, 13])
   })
 })
+
+describe('硬盘类型筛选(storageType)', () => {
+  const disks: PlanItem[] = [
+    mk({ id: 20, storageType: 'nvme', priceMonthly: 10 }),
+    mk({ id: 21, storageType: 'ssd', priceMonthly: 8 }),
+    mk({ id: 22, storageType: 'hdd', priceMonthly: 6 }),
+    mk({ id: 23, storageType: 'nvme', priceMonthly: 4 }),
+  ]
+  it('只保留指定硬盘类型', () => {
+    expect(filterSortPlans(disks, { ...base, storageType: 'nvme' }).map((p) => p.id).sort()).toEqual([20, 23])
+    expect(filterSortPlans(disks, { ...base, storageType: 'hdd' }).map((p) => p.id)).toEqual([22])
+  })
+  it('all / 未填 表示不限', () => {
+    expect(filterSortPlans(disks, { ...base, storageType: 'all' })).toHaveLength(4)
+    expect(filterSortPlans(disks, base)).toHaveLength(4)
+  })
+})
+
+describe('value-traffic 排序', () => {
+  const tplans: PlanItem[] = [
+    mk({ id: 30, trafficTB: 1, priceMonthly: 10 }), // 10/TB
+    mk({ id: 31, trafficTB: 20, priceMonthly: 4 }), // 0.2/TB
+    mk({ id: 32, trafficTB: 0, priceMonthly: 6 }), // 不限流量 → 最优置顶
+    mk({ id: 33, priceMonthly: 8 }), // 无流量 → 垫底
+    mk({ id: 34, trafficTB: 5 }), // 无价 → 垫底
+  ]
+  it('不限流量置顶,其次 $/TB 升序,缺流量/缺价垫底且稳定', () => {
+    expect(filterSortPlans(tplans, { ...base, sort: 'value-traffic' }).map((p) => p.id)).toEqual([32, 31, 30, 33, 34])
+  })
+})

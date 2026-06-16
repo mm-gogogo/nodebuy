@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { AffButton, ProviderMark } from '@/components/ui'
 import { priceLine, routeLabels, specLine } from '@/lib/labels'
 import { filterSortPlans, pricePerGbRam, pricePerGbStorage, type PlanItem, type PlanSort } from '@/lib/planBrowse'
+import { pricePerTbTraffic } from '@/lib/value'
 import { MAX_COMPARE } from '@/lib/compare'
 import { buildPlanQuery, DEFAULT_PLAN_STATE, type PlanQueryState } from '@/lib/planQuery'
 
@@ -15,6 +16,7 @@ const SORTS: { value: PlanSort; label: string }[] = [
   { value: 'ram-desc', label: '内存 大→小' },
   { value: 'value-ram', label: '每 G 内存最划算' },
   { value: 'value-storage', label: '每 G 硬盘最划算' },
+  { value: 'value-traffic', label: '每 TB 流量最划算' },
 ]
 
 const RAM_STEPS: { mb: number; label: string }[] = [
@@ -23,6 +25,13 @@ const RAM_STEPS: { mb: number; label: string }[] = [
   { mb: 2048, label: '2G+' },
   { mb: 4096, label: '4G+' },
   { mb: 8192, label: '8G+' },
+]
+
+const STORAGE_TYPES: { value: string; label: string }[] = [
+  { value: 'all', label: '不限' },
+  { value: 'nvme', label: 'NVMe' },
+  { value: 'ssd', label: 'SSD' },
+  { value: 'hdd', label: 'HDD' },
 ]
 
 export function PlanBrowser({ items, initial }: { items: PlanItem[]; initial?: PlanQueryState }) {
@@ -36,14 +45,15 @@ export function PlanBrowser({ items, initial }: { items: PlanItem[]; initial?: P
   const [inStockOnly, setInStockOnly] = useState(init.inStockOnly)
   const [maxPrice, setMaxPrice] = useState(init.maxPrice)
   const [minRamMB, setMinRamMB] = useState(init.minRamMB)
+  const [storageType, setStorageType] = useState(init.storageType)
 
   // 把筛选状态同步进 URL(history.replaceState,纯客户端、不触发重新请求),
   // 让筛选视图可分享/可收藏/刷新后保持。
   useEffect(() => {
-    const qs = buildPlanQuery({ query, route, sort, maxPrice, minRamMB, inStockOnly })
+    const qs = buildPlanQuery({ query, route, sort, maxPrice, minRamMB, inStockOnly, storageType })
     const url = qs ? `${window.location.pathname}?${qs}` : window.location.pathname
     window.history.replaceState(null, '', url)
-  }, [query, route, sort, maxPrice, minRamMB, inStockOnly])
+  }, [query, route, sort, maxPrice, minRamMB, inStockOnly, storageType])
   const [selected, setSelected] = useState<number[]>([])
 
   const atMax = selected.length >= MAX_COMPARE
@@ -68,8 +78,9 @@ export function PlanBrowser({ items, initial }: { items: PlanItem[]; initial?: P
         inStockOnly,
         maxMonthly: maxMonthly != null && Number.isFinite(maxMonthly) ? maxMonthly : null,
         minRamMB,
+        storageType,
       }),
-    [items, query, route, sort, inStockOnly, maxMonthly, minRamMB],
+    [items, query, route, sort, inStockOnly, maxMonthly, minRamMB, storageType],
   )
 
   return (
@@ -155,6 +166,19 @@ export function PlanBrowser({ items, initial }: { items: PlanItem[]; initial?: P
             </button>
           ))}
         </div>
+        <div className="ram-tabs" role="group" aria-label="按硬盘类型筛选">
+          {STORAGE_TYPES.map((s) => (
+            <button
+              key={s.value}
+              type="button"
+              className={`filter-chip${storageType === s.value ? ' is-on' : ''}`}
+              aria-pressed={storageType === s.value}
+              onClick={() => setStorageType(s.value)}
+            >
+              {s.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       <ul className="plan-browse">
@@ -176,7 +200,14 @@ export function PlanBrowser({ items, initial }: { items: PlanItem[]; initial?: P
                 <strong>{price.amount}</strong>
                 {price.cycle}
                 {(() => {
-                  // 单价随性价比排序切换:硬盘排序时显示每 G 硬盘价,否则每 G 内存价
+                  // 单价随性价比排序切换:流量/硬盘/内存排序分别显示对应单价
+                  if (sort === 'value-traffic') {
+                    if (p.trafficTB === 0) return <span className="pb-unit">不限流量</span>
+                    const t = pricePerTbTraffic(p)
+                    return t != null ? (
+                      <span className="pb-unit">≈${t < 1 ? t.toFixed(2) : t.toFixed(1)}/TB流量</span>
+                    ) : null
+                  }
                   const storage = sort === 'value-storage'
                   const v = storage ? pricePerGbStorage(p) : pricePerGbRam(p)
                   return Number.isFinite(v) ? (
