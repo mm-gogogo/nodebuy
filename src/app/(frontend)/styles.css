@@ -617,6 +617,21 @@ main {
   color: var(--color-neutral);
   margin-right: var(--space-2xs);
 }
+/* 综合评分:紧跟标题、始终可见(不像 rev-metrics 在窄屏隐藏),是列表的质量速览 */
+.review-row .rev-score {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: var(--color-ink);
+  white-space: nowrap;
+}
+.review-row .rev-score .k {
+  color: var(--color-neutral);
+  font-weight: 500;
+  margin-right: var(--space-2xs);
+}
 @media (max-width: 640px) {
   .review-row .rev-metrics {
     display: none;
