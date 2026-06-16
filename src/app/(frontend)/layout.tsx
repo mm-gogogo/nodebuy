@@ -59,6 +59,9 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
               <Link href="/reviews">测评</Link>
             </li>
             <li>
+              <Link href="/benchmarks">跑分</Link>
+            </li>
+            <li>
               <Link href="/plans">套餐</Link>
             </li>
             <li>
