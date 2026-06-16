@@ -1255,6 +1255,64 @@ main {
   color: var(--color-accent);
 }
 
+/* ———— benchmark leaderboard ———— */
+.bench-rank {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+.bench-rank th,
+.bench-rank td {
+  padding: var(--space-sm) var(--space-md);
+  text-align: left;
+  border-bottom: var(--rule-hair) solid var(--color-rule);
+  white-space: nowrap;
+}
+.bench-rank thead th {
+  font-size: var(--text-xs);
+  color: var(--color-neutral);
+  font-weight: 600;
+  border-bottom: var(--rule-hair) solid var(--color-rule-strong);
+}
+.bench-rank td {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+.bench-rank .rank-no {
+  color: var(--color-neutral);
+}
+.bench-rank tbody tr:first-child .rank-no {
+  color: var(--color-accent);
+  font-weight: 700;
+}
+.bench-rank .bench-title {
+  display: block;
+  font-family: var(--font-body);
+  font-weight: 550;
+  white-space: normal;
+  max-width: 22em;
+  transition: color var(--dur-short) var(--ease-out);
+}
+.bench-rank .bench-title:hover {
+  color: var(--color-accent);
+}
+.bench-rank .bench-provider {
+  display: block;
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  color: var(--color-neutral);
+}
+.bench-rank .bench-cpu {
+  font-size: var(--text-xs);
+  color: var(--color-ink-soft);
+  white-space: normal;
+  max-width: 12em;
+}
+.bench-rank td.is-sorted {
+  color: var(--color-ink);
+  font-weight: 700;
+}
+
 /* ———— breadcrumbs ———— */
 .breadcrumbs {
   padding-top: var(--space-xl);
