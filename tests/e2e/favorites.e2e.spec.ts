@@ -15,7 +15,7 @@ test.describe('收藏', () => {
 
     // 在收藏页取消收藏 → 列表清空
     await page.locator('.fav-list .fav-btn').first().click()
-    await expect(page.getByText('还没有收藏')).toBeVisible()
+    await expect(page.getByText('还没有收藏。去')).toBeVisible()
   })
 
   test('无收藏时显示空状态', async ({ page, context }) => {
@@ -23,6 +23,6 @@ test.describe('收藏', () => {
     await page.goto('/favorites')
     await page.evaluate(() => localStorage.removeItem('nodebuy:favorites'))
     await page.reload()
-    await expect(page.getByText('还没有收藏')).toBeVisible()
+    await expect(page.getByText('还没有收藏。去')).toBeVisible()
   })
 })

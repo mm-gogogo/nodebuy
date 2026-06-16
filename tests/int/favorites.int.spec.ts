@@ -1,5 +1,12 @@
 import { describe, it, expect } from 'vitest'
-import { parseFavorites, serializeFavorites, hasFavorite, toggleFavorite } from '@/lib/favorites'
+import {
+  parseFavorites,
+  serializeFavorites,
+  hasFavorite,
+  toggleFavorite,
+  FAVORITES_KEY,
+  PLAN_FAVORITES_KEY,
+} from '@/lib/favorites'
 
 describe('parseFavorites', () => {
   it('解析合法 JSON 数组', () => {
@@ -43,5 +50,18 @@ describe('toggleFavorite', () => {
     const orig = ['a']
     toggleFavorite(orig, 'b')
     expect(orig).toEqual(['a'])
+  })
+  it('对套餐 id 字符串同样适用(服务商存 slug、套餐存 String(id))', () => {
+    expect(toggleFavorite(['12'], '42')).toEqual(['12', '42'])
+    expect(toggleFavorite(['12', '42'], '12')).toEqual(['42'])
+    expect(parseFavorites(serializeFavorites(['7', '7', '9']))).toEqual(['7', '9'])
+  })
+})
+
+describe('收藏库 key 互相独立', () => {
+  it('服务商与套餐用不同 localStorage key', () => {
+    expect(FAVORITES_KEY).not.toBe(PLAN_FAVORITES_KEY)
+    expect(FAVORITES_KEY).toBe('nodebuy:favorites')
+    expect(PLAN_FAVORITES_KEY).toBe('nodebuy:fav-plans')
   })
 })

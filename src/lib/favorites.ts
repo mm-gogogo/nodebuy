@@ -1,6 +1,7 @@
-// 收藏(服务商 slug 列表)的纯逻辑;localStorage 读写在客户端 hook 里。
+// 收藏的纯逻辑(标识符列表,服务商存 slug、套餐存 String(id));localStorage 读写在客户端 hook 里。
 
-export const FAVORITES_KEY = 'nodebuy:favorites'
+export const FAVORITES_KEY = 'nodebuy:favorites' // 服务商收藏(slug)
+export const PLAN_FAVORITES_KEY = 'nodebuy:fav-plans' // 套餐收藏(String(id))
 
 export function parseFavorites(raw: string | null | undefined): string[] {
   if (!raw) return []

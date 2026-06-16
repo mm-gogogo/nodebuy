@@ -1039,6 +1039,12 @@ main {
   outline: 2px solid var(--color-accent);
   outline-offset: 1px;
 }
+/* 行内紧凑爱心(套餐行已较挤,只显图标) */
+.fav-btn--compact {
+  padding: var(--space-2xs) var(--space-xs);
+  font-size: var(--text-md);
+  line-height: 1;
+}
 .fav-actions {
   margin-bottom: var(--space-lg);
 }
