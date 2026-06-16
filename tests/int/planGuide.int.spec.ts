@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { recommendPlans, CN_OPTIMIZED_ROUTES } from '@/lib/planGuide'
-import type { PlanItem } from '@/lib/planBrowse'
+import { recommendPlans, CN_OPTIMIZED_ROUTES, useCaseKey, sortByUseCase } from '@/lib/planGuide'
+import { pricePerCore, type PlanItem } from '@/lib/planBrowse'
 
 const mk = (over: Partial<PlanItem>): PlanItem => ({
   id: 0,
@@ -53,5 +53,57 @@ describe('recommendPlans', () => {
 
   it('无匹配返回空', () => {
     expect(recommendPlans(items, { ...base, maxMonthly: 1 })).toEqual([])
+  })
+})
+
+describe('pricePerCore', () => {
+  const mkc = (over: Partial<PlanItem>) => mk(over)
+  it('每核等效月价,缺价/缺核为 Infinity', () => {
+    expect(pricePerCore(mkc({ cpuCores: 4, priceMonthly: 8 }))).toBe(2)
+    expect(pricePerCore(mkc({ cpuCores: 2, priceYearly: 120 }))).toBe(5) // 月10/2核
+    expect(pricePerCore(mkc({ priceMonthly: 8 }))).toBe(Infinity) // 无核
+    expect(pricePerCore(mkc({ cpuCores: 4 }))).toBe(Infinity) // 无价
+  })
+})
+
+describe('按用途推荐(useCase)', () => {
+  // P1=1 P2=2 P3=3 P4=4(均有货、无预算/内存限制)
+  const cases: PlanItem[] = [
+    mk({ id: 1, ramMB: 1024, storageGB: 20, trafficTB: 1, cpuCores: 1, priceMonthly: 10 }),
+    mk({ id: 2, ramMB: 4096, storageGB: 40, trafficTB: 20, cpuCores: 4, priceMonthly: 8 }),
+    mk({ id: 3, ramMB: 2048, storageGB: 2000, trafficTB: 5, cpuCores: 2, priceMonthly: 10 }),
+    mk({ id: 4, ramMB: 1024, storageGB: 30, trafficTB: 0, cpuCores: 8, priceMonthly: 40 }), // 不限流量
+  ]
+  const none = { maxMonthly: null, minRamMB: 0, cnOptimized: false }
+  const rec = (useCase: 'balanced' | 'traffic' | 'storage' | 'compute') =>
+    recommendPlans(cases, { ...none, useCase }).map((p) => p.id)
+
+  it('通用/建站:按每 G 内存', () => {
+    // $/G内存:P2=2, P3=5, P1=10, P4=40
+    expect(rec('balanced')).toEqual([2, 3, 1, 4])
+  })
+  it('存储/备份:按每 G 硬盘', () => {
+    // $/G硬盘:P3=0.005, P2=0.2, P1=0.5, P4≈1.33
+    expect(rec('storage')).toEqual([3, 2, 1, 4])
+  })
+  it('中转/流量:按每 TB,不限流量置顶', () => {
+    // 不限(P4) → P2=0.4 → P3=2 → P1=10
+    expect(rec('traffic')).toEqual([4, 2, 3, 1])
+  })
+  it('算力:按每核,并列稳定', () => {
+    // $/核:P2=2, P3=5, P4=5, P1=10(P3、P4 并列,稳定保持 P3 在前)
+    expect(rec('compute')).toEqual([2, 3, 4, 1])
+  })
+  it('缺省用途等同 balanced', () => {
+    expect(recommendPlans(cases, none).map((p) => p.id)).toEqual([2, 3, 1, 4])
+  })
+
+  it('useCaseKey:不限流量记为 -Infinity(最优)', () => {
+    expect(useCaseKey(cases[3], 'traffic')).toBe(-Infinity)
+  })
+  it('sortByUseCase 不修改入参', () => {
+    const before = cases.map((p) => p.id)
+    sortByUseCase(cases, 'storage')
+    expect(cases.map((p) => p.id)).toEqual(before)
   })
 })

@@ -50,6 +50,13 @@ export function pricePerGbStorage(plan: PlanItem): number {
   return m / plan.storageGB
 }
 
+// 每核 vCPU 的等效月价($/核),面向算力型买家;缺价或缺核视为无穷大(排末尾)。
+export function pricePerCore(plan: PlanItem): number {
+  const m = effectiveMonthly(plan)
+  if (!Number.isFinite(m) || !plan.cpuCores) return Infinity
+  return m / plan.cpuCores
+}
+
 export function filterSortPlans(items: PlanItem[], state: PlanBrowseState): PlanItem[] {
   const q = state.query.trim().toLowerCase()
   const filtered = items.filter((p) => {
