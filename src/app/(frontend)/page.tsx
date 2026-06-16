@@ -8,24 +8,65 @@ import { CopyCode } from '@/components/CopyCode'
 import { categoryDescriptions, categoryLabels, fmtDate, priceLine, routeLabels, specLine } from '@/lib/labels'
 import { activeDealsWhere } from '@/lib/queries'
 import { expiryUrgency } from '@/lib/deals'
+import { benchmarkRows, sortBenchmarks, type BenchReviewLike } from '@/lib/benchmarks'
+import { networkRows, sortNetwork, type NetReviewLike } from '@/lib/network'
+import { filterSortPlans, pricePerGbRam, type PlanItem } from '@/lib/planBrowse'
 
 export const revalidate = 60
 
 export default async function HomePage() {
   const payload = await getPayload({ config })
 
-  const [providers, plans, reviews, rankings, deals] = await Promise.all([
+  const [providers, plansRes, reviews, rankings, deals] = await Promise.all([
     payload.find({ collection: 'providers', limit: 100, sort: '-overallScore' }),
-    // 首页只用套餐总数,不需要套餐列表 —— 用 count 避免拉取并 populate 整个集合
-    payload.count({ collection: 'plans' }),
-    payload.find({ collection: 'reviews', limit: 7, sort: '-publishedAt', where: { _status: { equals: 'published' } } }),
+    payload.find({ collection: 'plans', limit: 1000 }),
+    payload.find({ collection: 'reviews', limit: 200, sort: '-publishedAt', where: { _status: { equals: 'published' } } }),
     payload.find({ collection: 'rankings', limit: 20, sort: 'createdAt' }),
     payload.find({ collection: 'deals', limit: 6, sort: '-featured', where: activeDealsWhere() }),
   ])
 
   const featuredRanking =
     rankings.docs.find((r) => r.featured) || rankings.docs.find((r) => r.category === 'overall') || rankings.docs[0]
-  const [leadReview, ...restReviews] = reviews.docs
+  const [leadReview, ...restReviews] = reviews.docs.slice(0, 7)
+
+  // —— 性能之最:复用排行逻辑,在首页直接亮出最强 / 最低延迟 / 最划算 ——
+  const reviewLite = reviews.docs.map((r) => ({
+    slug: r.slug,
+    title: r.title,
+    providerName: typeof r.provider === 'object' ? r.provider?.name || '—' : '—',
+    benchmarks: r.benchmarks,
+  }))
+  const topGb5 = sortBenchmarks(benchmarkRows(reviewLite as BenchReviewLike[]), 'gb5Single')[0] ?? null
+  const lowestLatency = sortNetwork(networkRows(reviewLite as NetReviewLike[]), 'latency')[0] ?? null
+  const planItems: PlanItem[] = plansRes.docs.map((p) => {
+    const prov = typeof p.provider === 'object' ? p.provider : null
+    return {
+      id: p.id as number,
+      name: p.name,
+      providerName: prov?.name || '—',
+      providerSlug: prov?.slug || '',
+      brandColor: prov?.brandColor,
+      cpuCores: p.cpuCores,
+      ramMB: p.ramMB,
+      storageGB: p.storageGB,
+      storageType: p.storageType,
+      trafficTB: p.trafficTB,
+      route: p.route,
+      location: p.location,
+      priceMonthly: p.priceMonthly,
+      priceYearly: p.priceYearly,
+      inStock: p.inStock !== false,
+    }
+  })
+  const bestValue =
+    filterSortPlans(planItems, {
+      query: '',
+      route: 'all',
+      sort: 'value-ram',
+      inStockOnly: true,
+    })[0] ?? null
+  const bestValueUnit = bestValue ? pricePerGbRam(bestValue) : Infinity
+  const hasHighlights = Boolean(topGb5 || lowestLatency || bestValue)
 
   return (
     <div className="wrap">
@@ -40,7 +81,7 @@ export default async function HomePage() {
             已收录 <strong>{providers.totalDocs}</strong> 家服务商
           </span>
           <span>
-            <strong>{plans.totalDocs}</strong> 个在售套餐
+            <strong>{plansRes.totalDocs}</strong> 个在售套餐
           </span>
           <span>
             <strong>{reviews.totalDocs}</strong> 篇实测报告
@@ -50,6 +91,41 @@ export default async function HomePage() {
           </span>
         </p>
       </header>
+
+      {/* —— 性能之最:亮出全站实测里的最强 / 最低延迟 / 最划算 —— */}
+      {hasHighlights ? (
+        <section className="rail--tight" aria-label="性能之最">
+          <ul className="highlight-strip">
+            {topGb5 && topGb5.gb5Single != null ? (
+              <li>
+                <Link href={`/reviews/${topGb5.slug}`} className="hl-card">
+                  <span className="hl-k">跑分最强</span>
+                  <span className="hl-v">{topGb5.gb5Single.toLocaleString('en-US')}</span>
+                  <span className="hl-sub">GB5 单核 · {topGb5.providerName}</span>
+                </Link>
+              </li>
+            ) : null}
+            {lowestLatency && lowestLatency.minLatency != null ? (
+              <li>
+                <Link href={`/reviews/${lowestLatency.slug}`} className="hl-card">
+                  <span className="hl-k">延迟最低</span>
+                  <span className="hl-v">{lowestLatency.minLatency} ms</span>
+                  <span className="hl-sub">三网最低 · {lowestLatency.providerName}</span>
+                </Link>
+              </li>
+            ) : null}
+            {bestValue && Number.isFinite(bestValueUnit) ? (
+              <li>
+                <Link href="/plans?sort=value-ram" className="hl-card">
+                  <span className="hl-k">最划算</span>
+                  <span className="hl-v">${bestValueUnit < 1 ? bestValueUnit.toFixed(2) : bestValueUnit.toFixed(1)}/G</span>
+                  <span className="hl-sub">每 G 内存 · {bestValue.providerName} {bestValue.name}</span>
+                </Link>
+              </li>
+            ) : null}
+          </ul>
+        </section>
+      ) : null}
 
       {/* —— Rail 1 · 精选榜单 —— */}
       {featuredRanking ? (
