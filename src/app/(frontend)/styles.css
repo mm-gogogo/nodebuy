@@ -1223,6 +1223,19 @@ main {
     display: none;
   }
 }
+/* 窄屏:套餐行允许换行,价格与对比/入手按钮落到第二行,避免 CTA 被裁 */
+@media (max-width: 560px) {
+  .plan-browse li {
+    flex-wrap: wrap;
+    row-gap: var(--space-sm);
+  }
+  .plan-browse .pb-main {
+    flex: 1 0 56%;
+  }
+  .plan-browse .pb-price {
+    margin-left: auto;
+  }
+}
 
 /* ———— provider index page ———— */
 .provider-index {
