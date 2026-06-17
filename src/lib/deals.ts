@@ -18,3 +18,14 @@ export function expiryUrgency(expiresAt: string | null | undefined, now: Date = 
   if (days < 0 || days > SOON_DAYS) return null
   return days === 0 ? '今天到期' : `还剩 ${days} 天`
 }
+
+// 后台只读「状态」列:据失效日期与当前日期判定。无日期/非法日期当作长期有效。
+//  已过期(< 0) / 即将过期(0..SOON_DAYS) / 有效(> SOON_DAYS) / 长期有效(无失效日期)
+export function dealStatus(expiresAt: string | null | undefined, now: Date = new Date()): string {
+  if (!expiresAt) return '长期有效'
+  const days = daysUntilExpiry(expiresAt, now)
+  if (!Number.isFinite(days)) return '长期有效'
+  if (days < 0) return '已过期'
+  if (days <= SOON_DAYS) return '即将过期'
+  return '有效'
+}

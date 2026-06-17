@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { daysUntilExpiry, expiryUrgency } from '@/lib/deals'
+import { daysUntilExpiry, expiryUrgency, dealStatus } from '@/lib/deals'
 
 const now = new Date('2026-06-15T10:00:00.000Z')
 
@@ -37,5 +37,20 @@ describe('expiryUrgency', () => {
   it('无失效日期不提示', () => {
     expect(expiryUrgency(null, now)).toBeNull()
     expect(expiryUrgency(undefined, now)).toBeNull()
+  })
+})
+
+describe('dealStatus', () => {
+  it('已过期 / 即将过期(≤3天)/ 有效', () => {
+    expect(dealStatus('2026-06-14', now)).toBe('已过期') // -1
+    expect(dealStatus('2026-06-15', now)).toBe('即将过期') // 0,今天
+    expect(dealStatus('2026-06-18', now)).toBe('即将过期') // 3 = SOON_DAYS
+    expect(dealStatus('2026-06-19', now)).toBe('有效') // 4 > 3
+    expect(dealStatus('2026-12-31', now)).toBe('有效')
+  })
+  it('无失效日期 / 非法日期当作长期有效', () => {
+    expect(dealStatus(null, now)).toBe('长期有效')
+    expect(dealStatus(undefined, now)).toBe('长期有效')
+    expect(dealStatus('not-a-date', now)).toBe('长期有效')
   })
 })
