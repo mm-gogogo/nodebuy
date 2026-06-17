@@ -14,6 +14,7 @@ describe('buildPlanQuery', () => {
       minRamMB: 2048,
       inStockOnly: true,
       storageType: 'nvme',
+      region: 'apac',
     })
     const p = new URLSearchParams(qs)
     expect(p.get('q')).toBe('bwh') // 去空白
@@ -23,9 +24,10 @@ describe('buildPlanQuery', () => {
     expect(p.get('ram')).toBe('2048')
     expect(p.get('stock')).toBe('1')
     expect(p.get('disk')).toBe('nvme')
+    expect(p.get('region')).toBe('apac')
   })
-  it('storageType=all 不写入', () => {
-    expect(buildPlanQuery({ ...DEFAULT_PLAN_STATE, storageType: 'all' })).toBe('')
+  it('storageType=all / region=all 不写入', () => {
+    expect(buildPlanQuery({ ...DEFAULT_PLAN_STATE, storageType: 'all', region: 'all' })).toBe('')
   })
   it('price-asc 与 all 等默认不写入', () => {
     expect(buildPlanQuery({ ...DEFAULT_PLAN_STATE, sort: 'price-asc', route: 'all' })).toBe('')
@@ -38,7 +40,16 @@ describe('readPlanQuery', () => {
   })
   it('解析各字段', () => {
     expect(
-      readPlanQuery({ q: 'x', route: 'cmin2', sort: 'price-desc', max: '20', ram: '4096', stock: '1', disk: 'hdd' }),
+      readPlanQuery({
+        q: 'x',
+        route: 'cmin2',
+        sort: 'price-desc',
+        max: '20',
+        ram: '4096',
+        stock: '1',
+        disk: 'hdd',
+        region: 'na',
+      }),
     ).toEqual({
       query: 'x',
       route: 'cmin2',
@@ -47,7 +58,12 @@ describe('readPlanQuery', () => {
       minRamMB: 4096,
       inStockOnly: true,
       storageType: 'hdd',
+      region: 'na',
     })
+  })
+  it('非法 region 回落 all', () => {
+    expect(readPlanQuery({ region: 'mars' }).region).toBe('all')
+    expect(readPlanQuery({ region: 'eu' }).region).toBe('eu')
   })
   it('非法 sort 回落 price-asc', () => {
     expect(readPlanQuery({ sort: 'bogus' }).sort).toBe('price-asc')
@@ -82,6 +98,7 @@ describe('往返一致', () => {
       minRamMB: 8192,
       inStockOnly: true,
       storageType: 'nvme',
+      region: 'apac',
     }
     const params = Object.fromEntries(new URLSearchParams(buildPlanQuery(state)))
     expect(readPlanQuery(params)).toEqual(state)

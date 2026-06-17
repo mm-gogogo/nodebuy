@@ -1,5 +1,7 @@
 // 跨服务商套餐浏览的筛选与排序逻辑(纯函数,便于单测;客户端组件复用)。
 
+import { planRegion } from './planRegion'
+
 export interface PlanItem {
   id: number
   name: string
@@ -28,6 +30,7 @@ export interface PlanBrowseState {
   maxMonthly?: number | null // 等效月价上限($/月),null/未填=不限
   minRamMB?: number // 内存下限(MB),0/未填=不限
   storageType?: string // 硬盘类型筛选('all'/未填=不限,否则 nvme/ssd/hdd)
+  region?: string // 机房区域筛选('all'/未填=不限,否则 na/eu/apac/cn)
 }
 
 // 归一为「等效月价」用于排序:优先月付,否则年付/12;都没有则视为无穷大(排末尾)。
@@ -66,6 +69,7 @@ export function filterSortPlans(items: PlanItem[], state: PlanBrowseState): Plan
     if (state.maxMonthly != null && effectiveMonthly(p) > state.maxMonthly) return false
     if (state.minRamMB && (p.ramMB ?? 0) < state.minRamMB) return false
     if (state.storageType && state.storageType !== 'all' && p.storageType !== state.storageType) return false
+    if (state.region && state.region !== 'all' && planRegion(p.location) !== state.region) return false
     if (q) {
       const hay = `${p.name} ${p.providerName} ${p.location ?? ''}`.toLowerCase()
       if (!hay.includes(q)) return false

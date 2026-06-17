@@ -151,3 +151,24 @@ describe('value-traffic 排序', () => {
     expect(filterSortPlans(tplans, { ...base, sort: 'value-traffic' }).map((p) => p.id)).toEqual([32, 31, 30, 33, 34])
   })
 })
+
+describe('机房区域筛选(region)', () => {
+  const geo: PlanItem[] = [
+    mk({ id: 40, location: '洛杉矶 DC6', priceMonthly: 5 }), // na
+    mk({ id: 41, location: '东京', priceMonthly: 5 }), // apac
+    mk({ id: 42, location: '法尔肯施泰因', priceMonthly: 5 }), // eu
+    mk({ id: 43, location: '上海', priceMonthly: 5 }), // cn
+    mk({ id: 44, location: '香港 MEGA', priceMonthly: 5 }), // apac
+    mk({ id: 45, location: '火星', priceMonthly: 5 }), // 未命中
+  ]
+  it('按区域归类筛选', () => {
+    expect(filterSortPlans(geo, { ...base, region: 'na' }).map((p) => p.id)).toEqual([40])
+    expect(filterSortPlans(geo, { ...base, region: 'apac' }).map((p) => p.id).sort()).toEqual([41, 44])
+    expect(filterSortPlans(geo, { ...base, region: 'eu' }).map((p) => p.id)).toEqual([42])
+    expect(filterSortPlans(geo, { ...base, region: 'cn' }).map((p) => p.id)).toEqual([43])
+  })
+  it('all / 未填 表示不限(含未命中区域的)', () => {
+    expect(filterSortPlans(geo, { ...base, region: 'all' })).toHaveLength(6)
+    expect(filterSortPlans(geo, base)).toHaveLength(6)
+  })
+})
