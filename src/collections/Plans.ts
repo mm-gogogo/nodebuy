@@ -1,12 +1,13 @@
 import type { CollectionConfig } from 'payload'
 import { validateMonthlyPrice, validateNonNegative, validatePositive } from '../lib/planValidation'
+import { effectiveMonthlyDisplay } from '../lib/planComputed'
 
 export const Plans: CollectionConfig = {
   slug: 'plans',
   labels: { singular: '套餐', plural: '套餐' },
   admin: {
     useAsTitle: 'name',
-    defaultColumns: ['name', 'provider', 'priceYearly', 'location', 'inStock'],
+    defaultColumns: ['name', 'provider', 'priceYearly', 'effMonthly', 'location', 'inStock'],
     group: '内容',
   },
   access: { read: () => true },
@@ -49,6 +50,16 @@ export const Plans: CollectionConfig = {
         },
         { name: 'priceYearly', label: '年付 (USD)', type: 'number', validate: validatePositive },
       ],
+    },
+    {
+      name: 'effMonthly',
+      label: '等效月价 (自动)',
+      type: 'number',
+      virtual: true,
+      admin: { readOnly: true, description: '由月付、或年付/12 自动算出,仅供后台速览,不入库' },
+      hooks: {
+        afterRead: [({ data }) => effectiveMonthlyDisplay(data?.priceMonthly, data?.priceYearly)],
+      },
     },
     { name: 'route', label: '线路', type: 'select', options: [
       { label: 'CN2 GIA', value: 'cn2gia' },

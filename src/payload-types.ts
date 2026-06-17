@@ -250,6 +250,10 @@ export interface Plan {
    */
   priceMonthly?: number | null;
   priceYearly?: number | null;
+  /**
+   * 由月付、或年付/12 自动算出,仅供后台速览,不入库
+   */
+  effMonthly?: number | null;
   route?: ('cn2gia' | 'cn2gt' | 'cmin2' | '9929' | '4837' | 'direct' | 'bgp') | null;
   highlight?: string | null;
   affUrl?: string | null;
@@ -566,6 +570,7 @@ export interface PlansSelect<T extends boolean = true> {
   location?: T;
   priceMonthly?: T;
   priceYearly?: T;
+  effMonthly?: T;
   route?: T;
   highlight?: T;
   affUrl?: T;
