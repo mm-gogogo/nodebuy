@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import { autoSlug, validateSlug } from '../lib/slug'
 import { validateHexColor } from '../lib/color'
+import { validateOptionalUrl } from '../lib/urlValidation'
 
 export const Providers: CollectionConfig = {
   slug: 'providers',
@@ -26,8 +27,8 @@ export const Providers: CollectionConfig = {
     },
     { name: 'tagline', label: '一句话定位', type: 'text' },
     { name: 'description', label: '简介', type: 'textarea' },
-    { name: 'website', label: '官网', type: 'text' },
-    { name: 'affUrl', label: 'AFF 推广链接', type: 'text', admin: { description: '/go/<slug> 将 302 跳转到此链接' } },
+    { name: 'website', label: '官网', type: 'text', validate: validateOptionalUrl },
+    { name: 'affUrl', label: 'AFF 推广链接', type: 'text', validate: validateOptionalUrl, admin: { description: '/go/<slug> 将 302 跳转到此链接' } },
     { name: 'logo', label: 'Logo', type: 'upload', relationTo: 'media' },
     {
       name: 'brandColor',
