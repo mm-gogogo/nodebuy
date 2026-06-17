@@ -65,7 +65,9 @@ describe('套餐校验(集成)', () => {
 
   beforeAll(async () => {
     payload = await getPayload({ config: await config })
-    const provs = await payload.find({ collection: 'providers', limit: 1 })
+    // 固定取种子服务商 bandwagonhost,而非 docs[0]:后者默认按 -createdAt 排序,
+    // 可能取到其它并行集成测试刚建又删的临时服务商,导致建套餐时外键失效(偶发竞态)。
+    const provs = await payload.find({ collection: 'providers', where: { slug: { equals: 'bandwagonhost' } }, limit: 1 })
     providerId = provs.docs[0].id as number
   })
 
