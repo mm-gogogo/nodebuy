@@ -372,6 +372,10 @@ export interface Deal {
   discount?: string | null;
   expiresAt?: string | null;
   url?: string | null;
+  /**
+   * 据失效日期自动判定:已过期 / 即将过期(≤3天)/ 有效 / 长期有效
+   */
+  expiryStatus?: string | null;
   featured?: boolean | null;
   updatedAt: string;
   createdAt: string;
@@ -671,6 +675,7 @@ export interface DealsSelect<T extends boolean = true> {
   discount?: T;
   expiresAt?: T;
   url?: T;
+  expiryStatus?: T;
   featured?: T;
   updatedAt?: T;
   createdAt?: T;
