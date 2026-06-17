@@ -1,12 +1,13 @@
 import type { CollectionConfig } from 'payload'
 import { autoSlug, validateSlug } from '../lib/slug'
+import { reviewOverallDisplay } from '../lib/reviewComputed'
 
 export const Reviews: CollectionConfig = {
   slug: 'reviews',
   labels: { singular: '测评', plural: '测评' },
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'provider', 'publishedAt', '_status'],
+    defaultColumns: ['title', 'provider', 'overall', 'publishedAt', '_status'],
     group: '内容',
   },
   access: { read: () => true },
@@ -51,6 +52,14 @@ export const Reviews: CollectionConfig = {
           ],
         },
       ],
+    },
+    {
+      name: 'overall',
+      label: '综合评分 (自动)',
+      type: 'number',
+      virtual: true,
+      admin: { readOnly: true, description: '性能/网络/性价比/售后四项均值,仅供后台速览,不入库' },
+      hooks: { afterRead: [({ data }) => reviewOverallDisplay(data?.scores)] },
     },
     { name: 'verdict', label: '结论', type: 'textarea' },
     {

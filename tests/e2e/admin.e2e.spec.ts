@@ -44,4 +44,9 @@ test.describe('Admin Panel', () => {
     // 列表数据异步加载 + 首次冷编译,给虚拟计算列表头充足等待
     await expect(page.getByRole('columnheader', { name: /等效月价/ })).toBeVisible({ timeout: 20000 })
   })
+
+  test('测评列表展示「综合评分」只读计算列', async () => {
+    await page.goto('/admin/collections/reviews')
+    await expect(page.getByRole('columnheader', { name: /综合评分/ })).toBeVisible({ timeout: 20000 })
+  })
 })

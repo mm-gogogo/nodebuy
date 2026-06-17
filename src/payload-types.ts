@@ -299,6 +299,10 @@ export interface Review {
     value?: number | null;
     support?: number | null;
   };
+  /**
+   * 性能/网络/性价比/售后四项均值,仅供后台速览,不入库
+   */
+  overall?: number | null;
   verdict?: string | null;
   benchmarks?: {
     cpuModel?: string | null;
@@ -600,6 +604,7 @@ export interface ReviewsSelect<T extends boolean = true> {
         value?: T;
         support?: T;
       };
+  overall?: T;
   verdict?: T;
   benchmarks?:
     | T
