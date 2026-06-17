@@ -10,6 +10,7 @@ import { filterSortPlans, pricePerGbRam, pricePerGbStorage, type PlanItem, type 
 import { pricePerTbTraffic } from '@/lib/value'
 import { MAX_COMPARE } from '@/lib/compare'
 import { PLAN_FAVORITES_KEY } from '@/lib/favorites'
+import { REGION_LABELS, REGIONS } from '@/lib/planRegion'
 import { buildPlanQuery, DEFAULT_PLAN_STATE, type PlanQueryState } from '@/lib/planQuery'
 
 const SORTS: { value: PlanSort; label: string }[] = [
@@ -36,6 +37,11 @@ const STORAGE_TYPES: { value: string; label: string }[] = [
   { value: 'hdd', label: 'HDD' },
 ]
 
+const REGION_CHIPS: { value: string; label: string }[] = [
+  { value: 'all', label: '全部地区' },
+  ...REGIONS.map((r) => ({ value: r, label: REGION_LABELS[r] })),
+]
+
 export function PlanBrowser({ items, initial }: { items: PlanItem[]; initial?: PlanQueryState }) {
   const init = initial ?? DEFAULT_PLAN_STATE
   const [query, setQuery] = useState(init.query)
@@ -48,14 +54,15 @@ export function PlanBrowser({ items, initial }: { items: PlanItem[]; initial?: P
   const [maxPrice, setMaxPrice] = useState(init.maxPrice)
   const [minRamMB, setMinRamMB] = useState(init.minRamMB)
   const [storageType, setStorageType] = useState(init.storageType)
+  const [region, setRegion] = useState(init.region)
 
   // 把筛选状态同步进 URL(history.replaceState,纯客户端、不触发重新请求),
   // 让筛选视图可分享/可收藏/刷新后保持。
   useEffect(() => {
-    const qs = buildPlanQuery({ query, route, sort, maxPrice, minRamMB, inStockOnly, storageType })
+    const qs = buildPlanQuery({ query, route, sort, maxPrice, minRamMB, inStockOnly, storageType, region })
     const url = qs ? `${window.location.pathname}?${qs}` : window.location.pathname
     window.history.replaceState(null, '', url)
-  }, [query, route, sort, maxPrice, minRamMB, inStockOnly, storageType])
+  }, [query, route, sort, maxPrice, minRamMB, inStockOnly, storageType, region])
   const [selected, setSelected] = useState<number[]>([])
 
   const atMax = selected.length >= MAX_COMPARE
@@ -81,8 +88,9 @@ export function PlanBrowser({ items, initial }: { items: PlanItem[]; initial?: P
         maxMonthly: maxMonthly != null && Number.isFinite(maxMonthly) ? maxMonthly : null,
         minRamMB,
         storageType,
+        region,
       }),
-    [items, query, route, sort, inStockOnly, maxMonthly, minRamMB, storageType],
+    [items, query, route, sort, inStockOnly, maxMonthly, minRamMB, storageType, region],
   )
 
   return (
@@ -137,6 +145,20 @@ export function PlanBrowser({ items, initial }: { items: PlanItem[]; initial?: P
             onClick={() => setRoute(r)}
           >
             {routeLabels[r] || r}
+          </button>
+        ))}
+      </div>
+
+      <div className="region-tabs" role="group" aria-label="按机房区域筛选">
+        {REGION_CHIPS.map((r) => (
+          <button
+            key={r.value}
+            type="button"
+            className={`filter-chip${region === r.value ? ' is-on' : ''}`}
+            aria-pressed={region === r.value}
+            onClick={() => setRegion(r.value)}
+          >
+            {r.label}
           </button>
         ))}
       </div>

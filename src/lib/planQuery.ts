@@ -11,11 +11,13 @@ export interface PlanQueryState {
   minRamMB: number
   inStockOnly: boolean
   storageType: string // 'all' 或 nvme/ssd/hdd
+  region: string // 'all' 或 na/eu/apac/cn
 }
 
 const VALID_SORTS: PlanSort[] = ['price-asc', 'price-desc', 'ram-desc', 'value-ram', 'value-storage', 'value-traffic']
 const VALID_RAM = [0, 1024, 2048, 4096, 8192]
 const VALID_STORAGE = ['nvme', 'ssd', 'hdd']
+const VALID_REGION = ['na', 'eu', 'apac', 'cn']
 
 export const DEFAULT_PLAN_STATE: PlanQueryState = {
   query: '',
@@ -25,6 +27,7 @@ export const DEFAULT_PLAN_STATE: PlanQueryState = {
   minRamMB: 0,
   inStockOnly: false,
   storageType: 'all',
+  region: 'all',
 }
 
 // 只写入非默认值,URL 尽量干净。
@@ -37,6 +40,7 @@ export function buildPlanQuery(s: PlanQueryState): string {
   if (s.minRamMB) p.set('ram', String(s.minRamMB))
   if (s.inStockOnly) p.set('stock', '1')
   if (s.storageType && s.storageType !== 'all') p.set('disk', s.storageType)
+  if (s.region && s.region !== 'all') p.set('region', s.region)
   return p.toString()
 }
 
@@ -50,6 +54,7 @@ export function readPlanQuery(params: RawParams): PlanQueryState {
   const sortRaw = first(params.sort) as PlanSort | undefined
   const ram = Number(first(params.ram))
   const disk = first(params.disk)
+  const region = first(params.region)
   return {
     query: first(params.q) ?? '',
     route: first(params.route) ?? 'all',
@@ -58,5 +63,6 @@ export function readPlanQuery(params: RawParams): PlanQueryState {
     minRamMB: VALID_RAM.includes(ram) ? ram : 0,
     inStockOnly: first(params.stock) === '1',
     storageType: disk && VALID_STORAGE.includes(disk) ? disk : 'all',
+    region: region && VALID_REGION.includes(region) ? region : 'all',
   }
 }
