@@ -10,6 +10,7 @@ import { FavoriteButton } from '@/components/FavoriteButton'
 import { JsonLd } from '@/components/JsonLd'
 import { breadcrumbList } from '@/lib/jsonld'
 import { findProviderRankings, type RankingLite } from '@/lib/providerRankings'
+import { overallScore } from '@/lib/reviewFilter'
 import { categoryLabels, fmtDate, payLabels, priceLine, regionLabels, routeLabels, specLine } from '@/lib/labels'
 
 export const revalidate = 60
@@ -164,12 +165,21 @@ export default async function ProviderDetail({ params }: { params: Promise<{ slu
         <section className="rail">
           <RailHead title="相关测评" />
           <div role="list">
-            {reviews.docs.map((r) => (
-              <Link role="listitem" className="review-row" key={r.id} href={`/reviews/${r.slug}`}>
-                <span className="t">{r.title}</span>
-                <span className="meta">{fmtDate(r.publishedAt)}</span>
-              </Link>
-            ))}
+            {reviews.docs.map((r) => {
+              const overall = overallScore(r.scores)
+              return (
+                <Link role="listitem" className="review-row" key={r.id} href={`/reviews/${r.slug}`}>
+                  <span className="t">{r.title}</span>
+                  {overall != null ? (
+                    <span className="rev-score">
+                      <span className="k">综合</span>
+                      {overall.toFixed(1)}
+                    </span>
+                  ) : null}
+                  <span className="meta">{fmtDate(r.publishedAt)}</span>
+                </Link>
+              )
+            })}
           </div>
         </section>
       ) : null}
