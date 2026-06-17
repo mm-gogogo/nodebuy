@@ -245,6 +245,9 @@ export interface Plan {
   trafficTB?: number | null;
   bandwidthMbps?: number | null;
   location?: string | null;
+  /**
+   * 月付与年付至少填一个
+   */
   priceMonthly?: number | null;
   priceYearly?: number | null;
   route?: ('cn2gia' | 'cn2gt' | 'cmin2' | '9929' | '4837' | 'direct' | 'bgp') | null;

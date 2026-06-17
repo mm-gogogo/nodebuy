@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { validateMonthlyPrice, validateNonNegative, validatePositive } from '../lib/planValidation'
 
 export const Plans: CollectionConfig = {
   slug: 'plans',
@@ -15,9 +16,9 @@ export const Plans: CollectionConfig = {
     {
       type: 'row',
       fields: [
-        { name: 'cpuCores', label: 'vCPU 核数', type: 'number', required: true },
-        { name: 'ramMB', label: '内存 (MB)', type: 'number', required: true },
-        { name: 'storageGB', label: '硬盘 (GB)', type: 'number', required: true },
+        { name: 'cpuCores', label: 'vCPU 核数', type: 'number', required: true, validate: validatePositive },
+        { name: 'ramMB', label: '内存 (MB)', type: 'number', required: true, validate: validatePositive },
+        { name: 'storageGB', label: '硬盘 (GB)', type: 'number', required: true, validate: validatePositive },
         {
           name: 'storageType', label: '硬盘类型', type: 'select', defaultValue: 'nvme',
           options: [
@@ -31,16 +32,22 @@ export const Plans: CollectionConfig = {
     {
       type: 'row',
       fields: [
-        { name: 'trafficTB', label: '月流量 (TB)', type: 'number', admin: { description: '0 表示不限' } },
-        { name: 'bandwidthMbps', label: '带宽 (Mbps)', type: 'number' },
+        { name: 'trafficTB', label: '月流量 (TB)', type: 'number', validate: validateNonNegative, admin: { description: '0 表示不限' } },
+        { name: 'bandwidthMbps', label: '带宽 (Mbps)', type: 'number', validate: validatePositive },
         { name: 'location', label: '机房', type: 'text' },
       ],
     },
     {
       type: 'row',
       fields: [
-        { name: 'priceMonthly', label: '月付 (USD)', type: 'number' },
-        { name: 'priceYearly', label: '年付 (USD)', type: 'number' },
+        {
+          name: 'priceMonthly',
+          label: '月付 (USD)',
+          type: 'number',
+          validate: validateMonthlyPrice,
+          admin: { description: '月付与年付至少填一个' },
+        },
+        { name: 'priceYearly', label: '年付 (USD)', type: 'number', validate: validatePositive },
       ],
     },
     { name: 'route', label: '线路', type: 'select', options: [
