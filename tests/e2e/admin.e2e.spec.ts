@@ -38,4 +38,10 @@ test.describe('Admin Panel', () => {
     const editViewArtifact = page.locator('input[name="email"]')
     await expect(editViewArtifact).toBeVisible()
   })
+
+  test('套餐列表展示「等效月价」只读计算列', async () => {
+    await page.goto('/admin/collections/plans')
+    // 列表数据异步加载 + 首次冷编译,给虚拟计算列表头充足等待
+    await expect(page.getByRole('columnheader', { name: /等效月价/ })).toBeVisible({ timeout: 20000 })
+  })
 })
