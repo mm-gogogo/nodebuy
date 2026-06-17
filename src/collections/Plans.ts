@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import { validateMonthlyPrice, validateNonNegative, validatePositive } from '../lib/planValidation'
 import { effectiveMonthlyDisplay } from '../lib/planComputed'
+import { validateOptionalUrl } from '../lib/urlValidation'
 
 export const Plans: CollectionConfig = {
   slug: 'plans',
@@ -71,7 +72,7 @@ export const Plans: CollectionConfig = {
       { label: '国际 BGP', value: 'bgp' },
     ] },
     { name: 'highlight', label: '卖点', type: 'text' },
-    { name: 'affUrl', label: 'AFF 链接（覆盖服务商默认）', type: 'text' },
+    { name: 'affUrl', label: 'AFF 链接（覆盖服务商默认）', type: 'text', validate: validateOptionalUrl },
     { name: 'inStock', label: '有货', type: 'checkbox', defaultValue: true },
   ],
 }
