@@ -15,21 +15,32 @@ const SORTS: { value: ReviewSort; label: string }[] = [
   { value: 'value', label: '性价比评分' },
 ]
 
+const MIN_OVERALL_STEPS: { value: number; label: string }[] = [
+  { value: 0, label: '评分不限' },
+  { value: 7, label: '7 分+' },
+  { value: 8, label: '8 分+' },
+  { value: 9, label: '9 分+' },
+]
+
 export function ReviewBrowser({ items, initial }: { items: ReviewItem[]; initial?: ReviewQueryState }) {
   const init = initial ?? DEFAULT_REVIEW_STATE
   const [query, setQuery] = useState(init.query)
   const [provider, setProvider] = useState(init.provider)
   const [sort, setSort] = useState<ReviewSort>(init.sort)
+  const [minOverall, setMinOverall] = useState(init.minOverall)
 
   // 同步筛选状态到 URL(history.replaceState,纯客户端、不触发重新请求)
   useEffect(() => {
-    const qs = buildReviewQuery({ query, provider, sort })
+    const qs = buildReviewQuery({ query, provider, sort, minOverall })
     const url = qs ? `${window.location.pathname}?${qs}` : window.location.pathname
     window.history.replaceState(null, '', url)
-  }, [query, provider, sort])
+  }, [query, provider, sort, minOverall])
 
   const providers = useMemo(() => reviewProviderOptions(items), [items])
-  const shown = useMemo(() => filterReviews(items, { query, provider, sort }), [items, query, provider, sort])
+  const shown = useMemo(
+    () => filterReviews(items, { query, provider, sort, minOverall }),
+    [items, query, provider, sort, minOverall],
+  )
 
   return (
     <>
@@ -66,6 +77,20 @@ export function ReviewBrowser({ items, initial }: { items: ReviewItem[]; initial
         <span className="filter-count" role="status">
           {shown.length} / {items.length}
         </span>
+      </div>
+
+      <div className="route-tabs" role="group" aria-label="按综合评分下限筛选">
+        {MIN_OVERALL_STEPS.map((s) => (
+          <button
+            key={s.value}
+            type="button"
+            className={`filter-chip${minOverall === s.value ? ' is-on' : ''}`}
+            aria-pressed={minOverall === s.value}
+            onClick={() => setMinOverall(s.value)}
+          >
+            {s.label}
+          </button>
+        ))}
       </div>
 
       <div role="list">

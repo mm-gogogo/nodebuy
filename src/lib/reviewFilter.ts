@@ -28,6 +28,7 @@ export interface ReviewFilterState {
   query: string
   provider: string // 'all' 或具体服务商 slug
   sort?: ReviewSort // 缺省按最新
+  minOverall?: number // 综合评分下限,0/未填=不限;无评分的测评在设阈值时被排除
 }
 
 // 综合评分:性能/网络/性价比/售后四项的均值,只计有值项;全缺为 null。
@@ -61,6 +62,7 @@ export function filterReviews(items: ReviewItem[], state: ReviewFilterState): Re
   const sort = state.sort ?? 'newest'
   const filtered = items.filter((r) => {
     if (state.provider !== 'all' && r.providerSlug !== state.provider) return false
+    if (state.minOverall && (overallScore(r.scores) ?? -Infinity) < state.minOverall) return false
     if (q) {
       const hay = `${r.title} ${r.providerName}`.toLowerCase()
       if (!hay.includes(q)) return false

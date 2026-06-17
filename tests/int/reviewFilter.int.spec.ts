@@ -40,6 +40,26 @@ describe('filterReviews', () => {
   })
 })
 
+describe('filterReviews 综合评分下限', () => {
+  const scored: ReviewItem[] = [
+    mk({ id: 1, scores: { performance: 8, network: 8, value: 8, support: 8 } }), // 8.0
+    mk({ id: 2, scores: { performance: 9, network: 9, value: 9, support: 9 } }), // 9.0
+    mk({ id: 3, scores: { performance: 6, network: 6, value: 6, support: 6 } }), // 6.0
+    mk({ id: 4 }), // 无评分
+  ]
+  const b = { query: '', provider: 'all' }
+  it('8 分+ 只留综合 >= 8,无评分被排除', () => {
+    expect(filterReviews(scored, { ...b, minOverall: 8 }).map((r) => r.id)).toEqual([1, 2])
+  })
+  it('9 分+ 更严格', () => {
+    expect(filterReviews(scored, { ...b, minOverall: 9 }).map((r) => r.id)).toEqual([2])
+  })
+  it('0 或未设表示不限', () => {
+    expect(filterReviews(scored, { ...b, minOverall: 0 })).toHaveLength(4)
+    expect(filterReviews(scored, b)).toHaveLength(4)
+  })
+})
+
 describe('overallScore', () => {
   it('四项均值', () => {
     expect(overallScore({ performance: 8, network: 6, value: 7, support: 9 })).toBe(7.5)
