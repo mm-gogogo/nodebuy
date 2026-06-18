@@ -59,4 +59,15 @@ test.describe('Admin Panel', () => {
     await page.goto('/admin/collections/deals')
     await expect(page.getByRole('columnheader', { name: /状态/ })).toBeVisible({ timeout: 20000 })
   })
+
+  test('测评编辑表单按标签页分组(正文/评分/跑分与测速)', async () => {
+    await page.goto('/admin/collections/reviews/create')
+    // Payload 标签页渲染为 .tabs-field__tab-button(非 role=tab),标签文本唯一
+    await expect(page.getByText('跑分与测速', { exact: true })).toBeVisible({ timeout: 20000 })
+    // 默认在「正文」页:标题字段可见
+    await expect(page.locator('#field-title')).toBeVisible()
+    // 切到「评分」页:出现分项评分分组
+    await page.getByText('评分', { exact: true }).click()
+    await expect(page.getByText('分项评分')).toBeVisible()
+  })
 })
