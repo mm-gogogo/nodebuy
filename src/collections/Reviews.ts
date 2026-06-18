@@ -1,13 +1,13 @@
 import type { CollectionConfig } from 'payload'
 import { autoSlug, validateSlug } from '../lib/slug'
-import { reviewOverallDisplay } from '../lib/reviewComputed'
+import { reviewDataStatus, reviewOverallDisplay } from '../lib/reviewComputed'
 
 export const Reviews: CollectionConfig = {
   slug: 'reviews',
   labels: { singular: '测评', plural: '测评' },
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'provider', 'overall', 'publishedAt', '_status'],
+    defaultColumns: ['title', 'provider', 'overall', 'dataStatus', 'publishedAt', '_status'],
     group: '内容',
   },
   access: { read: () => true },
@@ -60,6 +60,14 @@ export const Reviews: CollectionConfig = {
       virtual: true,
       admin: { readOnly: true, description: '性能/网络/性价比/售后四项均值,仅供后台速览,不入库' },
       hooks: { afterRead: [({ data }) => reviewOverallDisplay(data?.scores)] },
+    },
+    {
+      name: 'dataStatus',
+      label: '数据完整度 (自动)',
+      type: 'text',
+      virtual: true,
+      admin: { readOnly: true, description: '据是否有 GB5 跑分 / 测速节点判定:缺数据的测评进不了跑分榜与测速榜' },
+      hooks: { afterRead: [({ data }) => reviewDataStatus(data?.benchmarks)] },
     },
     { name: 'verdict', label: '结论', type: 'textarea' },
     {
