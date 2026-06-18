@@ -293,6 +293,7 @@ export interface Review {
   publishedAt: string;
   author?: string | null;
   readingMinutes?: number | null;
+  verdict?: string | null;
   scores?: {
     performance?: number | null;
     network?: number | null;
@@ -307,7 +308,6 @@ export interface Review {
    * 据是否有 GB5 跑分 / 测速节点判定:缺数据的测评进不了跑分榜与测速榜
    */
   dataStatus?: string | null;
-  verdict?: string | null;
   benchmarks?: {
     cpuModel?: string | null;
     gb5Single?: number | null;
@@ -604,6 +604,7 @@ export interface ReviewsSelect<T extends boolean = true> {
   publishedAt?: T;
   author?: T;
   readingMinutes?: T;
+  verdict?: T;
   scores?:
     | T
     | {
@@ -614,7 +615,6 @@ export interface ReviewsSelect<T extends boolean = true> {
       };
   overall?: T;
   dataStatus?: T;
-  verdict?: T;
   benchmarks?:
     | T
     | {
