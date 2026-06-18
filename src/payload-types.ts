@@ -211,7 +211,6 @@ export interface Provider {
     value?: number | null;
     support?: number | null;
   };
-  overallScore?: number | null;
   pros?:
     | {
         item: string;
@@ -224,6 +223,7 @@ export interface Provider {
         id?: string | null;
       }[]
     | null;
+  overallScore?: number | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -550,7 +550,6 @@ export interface ProvidersSelect<T extends boolean = true> {
         value?: T;
         support?: T;
       };
-  overallScore?: T;
   pros?:
     | T
     | {
@@ -563,6 +562,7 @@ export interface ProvidersSelect<T extends boolean = true> {
         item?: T;
         id?: T;
       };
+  overallScore?: T;
   updatedAt?: T;
   createdAt?: T;
 }

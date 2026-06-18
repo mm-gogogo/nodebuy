@@ -70,4 +70,15 @@ test.describe('Admin Panel', () => {
     await page.getByText('评分', { exact: true }).click()
     await expect(page.getByText('分项评分')).toBeVisible()
   })
+
+  test('服务商编辑表单按标签页分组(基本信息/数据中心/评分与口碑)', async () => {
+    await page.goto('/admin/collections/providers/create')
+    // Payload 标签页渲染为 .tabs-field__tab-button(非 role=tab);「评分与口碑」标签文本唯一
+    await expect(page.getByText('评分与口碑', { exact: true })).toBeVisible({ timeout: 20000 })
+    // 默认在「基本信息」页:名称字段可见
+    await expect(page.locator('#field-name')).toBeVisible()
+    // 切到「评分与口碑」页:出现优点字段(「数据中心」既是标签也是字段名,故改用此标签切换)
+    await page.getByText('评分与口碑', { exact: true }).click()
+    await expect(page.getByText('优点', { exact: true })).toBeVisible()
+  })
 })
