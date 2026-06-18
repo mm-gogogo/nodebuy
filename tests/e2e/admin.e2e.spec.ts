@@ -50,6 +50,11 @@ test.describe('Admin Panel', () => {
     await expect(page.getByRole('columnheader', { name: /综合评分/ })).toBeVisible({ timeout: 20000 })
   })
 
+  test('测评列表展示「数据完整度」只读计算列', async () => {
+    await page.goto('/admin/collections/reviews')
+    await expect(page.getByRole('columnheader', { name: /数据完整度/ })).toBeVisible({ timeout: 20000 })
+  })
+
   test('优惠列表展示「状态」只读计算列', async () => {
     await page.goto('/admin/collections/deals')
     await expect(page.getByRole('columnheader', { name: /状态/ })).toBeVisible({ timeout: 20000 })

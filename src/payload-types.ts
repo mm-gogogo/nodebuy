@@ -303,6 +303,10 @@ export interface Review {
    * 性能/网络/性价比/售后四项均值,仅供后台速览,不入库
    */
   overall?: number | null;
+  /**
+   * 据是否有 GB5 跑分 / 测速节点判定:缺数据的测评进不了跑分榜与测速榜
+   */
+  dataStatus?: string | null;
   verdict?: string | null;
   benchmarks?: {
     cpuModel?: string | null;
@@ -609,6 +613,7 @@ export interface ReviewsSelect<T extends boolean = true> {
         support?: T;
       };
   overall?: T;
+  dataStatus?: T;
   verdict?: T;
   benchmarks?:
     | T
