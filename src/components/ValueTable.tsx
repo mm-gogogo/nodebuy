@@ -4,6 +4,8 @@ import React, { useMemo, useState } from 'react'
 import Link from 'next/link'
 
 import { sortValue, type ValueRow, type ValueSort } from '@/lib/value'
+import { toggleCapped } from '@/lib/selection'
+import { MAX_COMPARE } from '@/lib/compare'
 import { routeLabels } from '@/lib/labels'
 
 const SORTS: { value: ValueSort; label: string }[] = [
@@ -20,7 +22,10 @@ const unit = (n: number | null) => (n == null ? '—' : `$${n < 1 ? n.toFixed(2)
 
 export function ValueTable({ rows }: { rows: ValueRow[] }) {
   const [sort, setSort] = useState<ValueSort>('ram')
+  const [selected, setSelected] = useState<number[]>([])
   const sorted = useMemo(() => sortValue(rows, sort), [rows, sort])
+
+  const atMax = selected.length >= MAX_COMPARE
 
   return (
     <>
@@ -52,31 +57,58 @@ export function ValueTable({ rows }: { rows: ValueRow[] }) {
             </tr>
           </thead>
           <tbody>
-            {sorted.map((r, i) => (
-              <tr key={r.id}>
-                <td className="rank-no">{String(i + 1).padStart(2, '0')}</td>
-                <td>
-                  <Link href={`/providers/${r.providerSlug}`} className="bench-title">
-                    {r.name}
-                  </Link>
-                  <span className="bench-provider">
-                    {r.providerName}
-                    {r.location ? ` · ${r.location}` : ''}
-                    {r.route ? ` · ${routeLabels[r.route] || r.route}` : ''}
-                    {' · '}
-                    {money(r.monthly)}/月
-                  </span>
-                </td>
-                <td className={sort === 'ram' ? 'is-sorted' : undefined}>{unit(r.perGbRam)}</td>
-                <td className={sort === 'storage' ? 'is-sorted' : undefined}>{unit(r.perGbStorage)}</td>
-                <td className={sort === 'traffic' ? 'is-sorted' : undefined}>
-                  {r.unlimitedTraffic ? '不限' : unit(r.perTbTraffic)}
-                </td>
-              </tr>
-            ))}
+            {sorted.map((r, i) => {
+              const on = selected.includes(r.id)
+              return (
+                <tr key={r.id}>
+                  <td className="rank-no">{String(i + 1).padStart(2, '0')}</td>
+                  <td>
+                    <Link href={`/providers/${r.providerSlug}`} className="bench-title">
+                      {r.name}
+                    </Link>
+                    <span className="bench-provider">
+                      {r.providerName}
+                      {r.location ? ` · ${r.location}` : ''}
+                      {r.route ? ` · ${routeLabels[r.route] || r.route}` : ''}
+                      {' · '}
+                      {money(r.monthly)}/月
+                    </span>
+                    <button
+                      type="button"
+                      className={`cmp-toggle${on ? ' is-on' : ''}`}
+                      aria-pressed={on}
+                      disabled={!on && atMax}
+                      onClick={() => setSelected((cur) => toggleCapped(cur, r.id, MAX_COMPARE))}
+                      title={!on && atMax ? `最多对比 ${MAX_COMPARE} 个` : '加入对比'}
+                    >
+                      {on ? '✓ 已选' : '对比'}
+                    </button>
+                  </td>
+                  <td className={sort === 'ram' ? 'is-sorted' : undefined}>{unit(r.perGbRam)}</td>
+                  <td className={sort === 'storage' ? 'is-sorted' : undefined}>{unit(r.perGbStorage)}</td>
+                  <td className={sort === 'traffic' ? 'is-sorted' : undefined}>
+                    {r.unlimitedTraffic ? '不限' : unit(r.perTbTraffic)}
+                  </td>
+                </tr>
+              )
+            })}
           </tbody>
         </table>
       </div>
+
+      {selected.length > 0 ? (
+        <div className="compare-bar" role="region" aria-label="对比栏">
+          <span className="cmp-count">
+            已选 {selected.length}/{MAX_COMPARE} 个套餐
+          </span>
+          <button type="button" className="btn-ghost" onClick={() => setSelected([])}>
+            清空
+          </button>
+          <Link className="btn-ink" href={`/compare?plans=${selected.join(',')}`}>
+            对比这些套餐 →
+          </Link>
+        </div>
+      ) : null}
     </>
   )
 }
