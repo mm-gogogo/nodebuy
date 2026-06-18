@@ -1084,6 +1084,11 @@ main {
   opacity: 0.4;
   cursor: not-allowed;
 }
+/* 性价比排行表格里:对比按钮位于「套餐/服务商」单元格内,与上方副标题留点间距 */
+.bench-rank td .cmp-toggle {
+  display: inline-block;
+  margin-top: var(--space-2xs);
+}
 
 .compare-bar {
   position: sticky;
