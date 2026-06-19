@@ -2,13 +2,14 @@ import type { CollectionConfig } from 'payload'
 import { autoSlug, validateSlug } from '../lib/slug'
 import { validateHexColor } from '../lib/color'
 import { validateOptionalUrl } from '../lib/urlValidation'
+import { datacenterCoverage } from '../lib/providerCoverage'
 
 export const Providers: CollectionConfig = {
   slug: 'providers',
   labels: { singular: '服务商', plural: '服务商' },
   admin: {
     useAsTitle: 'name',
-    defaultColumns: ['name', 'slug', 'overallScore', 'updatedAt'],
+    defaultColumns: ['name', 'slug', 'coverage', 'overallScore', 'updatedAt'],
     group: '内容',
   },
   access: { read: () => true },
@@ -67,6 +68,14 @@ export const Providers: CollectionConfig = {
         {
           label: '数据中心',
           fields: [
+            {
+              name: 'coverage',
+              label: '机房覆盖 (自动)',
+              type: 'text',
+              virtual: true,
+              admin: { readOnly: true, description: '据下方数据中心自动汇总:机房数 · 覆盖区域 · 大陆优化数,仅供后台速览,不入库' },
+              hooks: { afterRead: [({ data }) => datacenterCoverage(data?.datacenters)] },
+            },
             {
               name: 'datacenters',
               label: '数据中心',

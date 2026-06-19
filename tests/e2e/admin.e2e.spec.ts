@@ -60,6 +60,13 @@ test.describe('Admin Panel', () => {
     await expect(page.getByRole('columnheader', { name: /状态/ })).toBeVisible({ timeout: 20000 })
   })
 
+  test('服务商列表展示「机房覆盖」只读计算列', async () => {
+    await page.goto('/admin/collections/providers')
+    await expect(page.getByRole('columnheader', { name: /机房覆盖/ })).toBeVisible({ timeout: 20000 })
+    // 列值确实由 datacenters 计算得出(种子里的服务商均有机房),而非空占位
+    await expect(page.getByText(/\d+ 机房/).first()).toBeVisible({ timeout: 20000 })
+  })
+
   test('测评编辑表单按标签页分组(正文/评分/跑分与测速)', async () => {
     await page.goto('/admin/collections/reviews/create')
     // Payload 标签页渲染为 .tabs-field__tab-button(非 role=tab),标签文本唯一
