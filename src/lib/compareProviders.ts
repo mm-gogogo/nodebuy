@@ -35,6 +35,7 @@ export interface CompareProvider {
   headquarters?: string | null
   paymentMethods?: string[] | null
   datacenterCount: number
+  regions?: string[] // 覆盖区域标签(已按规范顺序去重),如 ['北美','亚太']
   cnOptimized: boolean
 }
 
@@ -63,6 +64,7 @@ export function compareProviderRows(providers: CompareProvider[]): CompareRow[] 
       values: col((p) => (p.paymentMethods?.length ? p.paymentMethods.map((m) => payLabels[m] || m).join(' · ') : '—')),
     },
     { label: '机房数', values: col((p) => String(p.datacenterCount)), best: num((p) => p.datacenterCount) },
+    { label: '区域覆盖', values: col((p) => (p.regions?.length ? p.regions.join('/') : '—')) },
     { label: '大陆优化', values: col((p) => (p.cnOptimized ? '✓' : '—')) },
   ]
 }

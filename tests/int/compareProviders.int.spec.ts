@@ -31,13 +31,13 @@ describe('compareProviderRows', () => {
       name: '搬瓦工', slug: 'bwh', overallScore: 8.9,
       scores: { performance: 8.2, network: 9.6, value: 7.6, support: 7.8 },
       founded: 2012, headquarters: '加拿大', paymentMethods: ['alipay', 'paypal'],
-      datacenterCount: 8, cnOptimized: true,
+      datacenterCount: 8, regions: ['北美', '欧洲', '亚太'], cnOptimized: true,
     },
     {
       name: 'Hetzner', slug: 'hetzner', overallScore: 8.1,
       scores: { performance: 8.5, network: null, value: 9.2, support: 7 },
       founded: null, headquarters: null, paymentMethods: [],
-      datacenterCount: 2, cnOptimized: false,
+      datacenterCount: 2, regions: ['欧洲'], cnOptimized: false,
     },
   ]
 
@@ -50,7 +50,16 @@ describe('compareProviderRows', () => {
     expect(get('总部')).toEqual(['加拿大', '—'])
     expect(get('付款')).toEqual(['支付宝 · PayPal', '—']) // 空数组 → —
     expect(get('机房数')).toEqual(['8', '2'])
+    expect(get('区域覆盖')).toEqual(['北美/欧洲/亚太', '欧洲'])
     expect(get('大陆优化')).toEqual(['✓', '—'])
+  })
+
+  it('区域覆盖缺省时回退为 —', () => {
+    const rows = compareProviderRows([
+      { name: 'X', slug: 'x', datacenterCount: 0, cnOptimized: false }, // regions 省略
+      { name: 'Y', slug: 'y', datacenterCount: 1, regions: [], cnOptimized: false }, // 空数组
+    ])
+    expect(rows.find((r) => r.label === '区域覆盖')?.values).toEqual(['—', '—'])
   })
 
   it('标记每项最优列(bwh=0, hetzner=1)', () => {
@@ -66,6 +75,7 @@ describe('compareProviderRows', () => {
     expect(best('成立')).toBeUndefined()
     expect(best('总部')).toBeUndefined()
     expect(best('付款')).toBeUndefined()
+    expect(best('区域覆盖')).toBeUndefined()
     expect(best('大陆优化')).toBeUndefined()
   })
 

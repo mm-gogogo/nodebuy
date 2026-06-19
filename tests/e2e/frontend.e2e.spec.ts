@@ -45,4 +45,11 @@ test.describe('Frontend', () => {
     await expect(page.getByText('当前优惠')).toBeVisible()
     await expect(page.getByText('搬瓦工循环优惠码')).toBeVisible()
   })
+
+  test('服务商对比含「区域覆盖」行且填入真实区域', async ({ page }) => {
+    await page.goto('/compare-providers?slugs=bandwagonhost,dmit')
+    await expect(page.getByRole('rowheader', { name: '区域覆盖' })).toBeVisible()
+    // 单元格出现真实区域标签(而非全为占位符),证明页面正确传入了 regions
+    await expect(page.getByRole('cell', { name: /北美|亚太|欧洲|中国大陆/ }).first()).toBeVisible()
+  })
 })

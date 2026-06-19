@@ -5,6 +5,7 @@ import config from '@payload-config'
 
 import { AffButton, ProviderMark } from '@/components/ui'
 import { parseProviderSlugs, compareProviderRows, type CompareProvider } from '@/lib/compareProviders'
+import { datacenterRegionLabels } from '@/lib/providerCoverage'
 
 export const metadata = { title: '服务商对比' }
 
@@ -34,6 +35,7 @@ export default async function CompareProvidersPage({
         headquarters: p.headquarters,
         paymentMethods: p.paymentMethods,
         datacenterCount: p.datacenters?.length || 0,
+        regions: datacenterRegionLabels(p.datacenters),
         cnOptimized: (p.datacenters || []).some((dc) => dc.cnOptimized),
       }))
   }
