@@ -197,6 +197,10 @@ export interface Provider {
   founded?: number | null;
   headquarters?: string | null;
   paymentMethods?: ('alipay' | 'wechat' | 'paypal' | 'card' | 'crypto' | 'unionpay')[] | null;
+  /**
+   * 据下方数据中心自动汇总:机房数 · 覆盖区域 · 大陆优化数,仅供后台速览,不入库
+   */
+  coverage?: string | null;
   datacenters?:
     | {
         city: string;
@@ -534,6 +538,7 @@ export interface ProvidersSelect<T extends boolean = true> {
   founded?: T;
   headquarters?: T;
   paymentMethods?: T;
+  coverage?: T;
   datacenters?:
     | T
     | {
