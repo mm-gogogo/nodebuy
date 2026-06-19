@@ -6,7 +6,7 @@ import { AffButton } from '@/components/ui'
 import { CopyCode } from '@/components/CopyCode'
 import { fmtDate } from '@/lib/labels'
 import { activeDealsWhere } from '@/lib/queries'
-import { expiryUrgency } from '@/lib/deals'
+import { expiryUrgency, sortDealsByUrgency } from '@/lib/deals'
 
 export const revalidate = 60
 
@@ -14,7 +14,9 @@ export const metadata = { title: '优惠速递' }
 
 export default async function DealsPage() {
   const payload = await getPayload({ config })
-  const deals = await payload.find({ collection: 'deals', limit: 100, sort: '-featured', where: activeDealsWhere() })
+  const deals = await payload.find({ collection: 'deals', limit: 100, sort: '-createdAt', where: activeDealsWhere() })
+  // 置顶优先,其次让快到期的优惠浮到前面(与「⏳ 还剩 X 天」提示口径一致)。
+  const ordered = sortDealsByUrgency(deals.docs)
 
   return (
     <div className="wrap">
@@ -24,7 +26,7 @@ export default async function DealsPage() {
       </header>
       <section className="rail--tight">
         <div role="list">
-          {deals.docs.map((d) => {
+          {ordered.map((d) => {
             const provider = typeof d.provider === 'object' ? d.provider : null
             const soon = expiryUrgency(d.expiresAt)
             return (
