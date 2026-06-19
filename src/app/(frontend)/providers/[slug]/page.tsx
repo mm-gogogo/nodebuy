@@ -6,9 +6,12 @@ import { getPayload } from 'payload'
 import config from '@payload-config'
 
 import { AffButton, Breadcrumbs, ProviderMark, RailHead, ScoreBars } from '@/components/ui'
+import { CopyCode } from '@/components/CopyCode'
 import { FavoriteButton } from '@/components/FavoriteButton'
 import { JsonLd } from '@/components/JsonLd'
 import { breadcrumbList } from '@/lib/jsonld'
+import { providerActiveDealsWhere } from '@/lib/queries'
+import { expiryUrgency, sortDealsByUrgency } from '@/lib/deals'
 import { findProviderRankings, type RankingLite } from '@/lib/providerRankings'
 import { overallScore } from '@/lib/reviewFilter'
 import { categoryLabels, fmtDate, payLabels, priceLine, regionLabels, routeLabels, specLine } from '@/lib/labels'
@@ -38,7 +41,7 @@ export default async function ProviderDetail({ params }: { params: Promise<{ slu
   if (!provider) notFound()
 
   const payload = await getPayload({ config })
-  const [plans, reviews, rankings] = await Promise.all([
+  const [plans, reviews, rankings, deals] = await Promise.all([
     payload.find({ collection: 'plans', where: { provider: { equals: provider.id } }, limit: 50, sort: 'priceYearly' }),
     payload.find({
       collection: 'reviews',
@@ -47,9 +50,11 @@ export default async function ProviderDetail({ params }: { params: Promise<{ slu
       sort: '-publishedAt',
     }),
     payload.find({ collection: 'rankings', limit: 50, depth: 0 }),
+    payload.find({ collection: 'deals', where: providerActiveDealsWhere(provider.id), limit: 20, depth: 0 }),
   ])
 
   const appearances = findProviderRankings(rankings.docs as RankingLite[], provider.id)
+  const orderedDeals = sortDealsByUrgency(deals.docs)
 
   const crumbs = [
     { name: '首页', path: '/' },
@@ -131,6 +136,30 @@ export default async function ProviderDetail({ params }: { params: Promise<{ slu
               </span>
             ))}
           </p>
+        </section>
+      ) : null}
+
+      {orderedDeals.length ? (
+        <section className="rail">
+          <RailHead title="当前优惠" />
+          <div role="list">
+            {orderedDeals.map((d) => {
+              const soon = expiryUrgency(d.expiresAt)
+              return (
+                <div role="listitem" className="deal-row" key={d.id}>
+                  <div className="grow">
+                    <span className="t">{d.title}</span>
+                    {d.description ? <span className="d" style={{ display: 'block' }}>{d.description}</span> : null}
+                  </div>
+                  {d.discount ? <span className="badge badge--accent">{d.discount}</span> : null}
+                  {d.code ? <CopyCode code={d.code} /> : null}
+                  {soon ? <span className="exp-soon">⏳ {soon}</span> : null}
+                  {d.expiresAt ? <span className="exp">截至 {fmtDate(d.expiresAt)}</span> : null}
+                  <AffButton slug={provider.slug} dealId={d.id} label="去领取" />
+                </div>
+              )
+            })}
+          </div>
         </section>
       ) : null}
 

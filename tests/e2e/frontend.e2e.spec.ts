@@ -38,4 +38,11 @@ test.describe('Frontend', () => {
     expect(feed.headers()['content-type']).toContain('application/rss+xml')
     expect(await feed.text()).toContain('<rss')
   })
+
+  test('服务商详情页展示该服务商的当前优惠', async ({ page }) => {
+    await page.goto('/providers/bandwagonhost')
+    // 「当前优惠」板块与该服务商的有效优惠(种子里 bandwagonhost 的循环码)应渲染
+    await expect(page.getByText('当前优惠')).toBeVisible()
+    await expect(page.getByText('搬瓦工循环优惠码')).toBeVisible()
+  })
 })
