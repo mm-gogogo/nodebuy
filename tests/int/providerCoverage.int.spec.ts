@@ -1,6 +1,24 @@
 import { describe, it, expect } from 'vitest'
-import { datacenterCoverage } from '@/lib/providerCoverage'
+import { datacenterCoverage, datacenterRegionLabels } from '@/lib/providerCoverage'
 import type { Region } from '@/lib/planRegion'
+
+describe('datacenterRegionLabels', () => {
+  it('空 / null / undefined 返回空数组', () => {
+    expect(datacenterRegionLabels([])).toEqual([])
+    expect(datacenterRegionLabels(null)).toEqual([])
+    expect(datacenterRegionLabels(undefined)).toEqual([])
+  })
+
+  it('去重并按 na/eu/apac/cn 规范顺序', () => {
+    const dcs = [{ region: 'apac' as const }, { region: 'na' as const }, { region: 'apac' as const }, { region: 'cn' as const }]
+    expect(datacenterRegionLabels(dcs)).toEqual(['北美', '亚太', '中国大陆'])
+  })
+
+  it('忽略缺失/非法区域值', () => {
+    const dcs = [{ region: null }, { region: undefined }, { region: 'na' as const }, { region: 'mars' as unknown as Region }]
+    expect(datacenterRegionLabels(dcs)).toEqual(['北美'])
+  })
+})
 
 describe('datacenterCoverage', () => {
   it('空 / null / undefined 返回占位符', () => {
