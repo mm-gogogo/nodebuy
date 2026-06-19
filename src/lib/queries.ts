@@ -12,3 +12,8 @@ export function activeDealsWhere(now: Date = new Date()): Where {
     ],
   }
 }
+
+// 某服务商当前有效的优惠:在「未过期」基础上叠加 provider 过滤,用于服务商详情页。
+export function providerActiveDealsWhere(providerId: number | string, now: Date = new Date()): Where {
+  return { and: [activeDealsWhere(now), { provider: { equals: providerId } }] }
+}
